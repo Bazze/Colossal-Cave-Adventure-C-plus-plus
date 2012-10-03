@@ -11,6 +11,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <stdlib.h>
 
 // Location
 #include "Location.h"
@@ -92,10 +93,10 @@ void Data::loadData(const string filename) {
     
     // If the file was successfully opened, start processing
     if (dataFile.is_open()) {
-        
+
         // Parse the lines in the file
         this->parseLines(dataFile);
-        
+
         // Close file stream
         dataFile.close();
     }
@@ -110,37 +111,37 @@ void Data::loadData(const string filename) {
 void Data::parseLines(ifstream &dataFile) {
     string line;
     vector<string> lineVector;
-    
+
     // The data file is divided into different sections, this
     // variable keeps track of which section is being parsed
     int currentSection = -1;
-    
+
     // Since a location's information can be stored on several
     // lines we need to keep track of the current location
     // number being processed
     //int currentLocation = -1;
-    
+
     Location* currentLocation = NULL;
     Word* currentWord = NULL;
     Object* currentObject = NULL;
     Message* currentMessage = NULL;
     ActionVerb* currentActionVerb = NULL;
-    
+
     int idNumber = -1;
-    
+
     // Run as long as there are lines left to read
     while (dataFile.good()) {
         // Get line from the file stream
         getline(dataFile, line);
-        
+
         // Clear the vector from previous lines
         if (lineVector.size() > 0) {
             lineVector.clear();
         }
-        
+
         // Parse the line
         this->split(line, '\t', lineVector);
-        
+
         // If this line is the end of the section, proceed to next section
         if (lineVector.size() > 0 && lineVector.at(0) == "-1") {
             // Reset some variables for the next section
@@ -157,7 +158,7 @@ void Data::parseLines(ifstream &dataFile) {
         // If it's not the end of a section, check if it is the beginning
         else if (currentSection == -1) {
             currentSection = atoi(lineVector.at(0).c_str());
-            
+
             // We don't want to parse the line which indicate the beginning
             // of a section
             continue;
@@ -166,10 +167,10 @@ void Data::parseLines(ifstream &dataFile) {
             // First is always an id/number
             idNumber = atoi(lineVector.at(0).c_str());
         }
-        
+
         // Handle the data in different ways depending on the currentSection
         switch (currentSection) {
-            
+
             /* ------------------------------------------------------------------
              * SECTION 1:
              * ------------------------------------------------------------------
@@ -186,7 +187,7 @@ void Data::parseLines(ifstream &dataFile) {
                 currentLocation->appendToLongDescription(lineVector.at(1));
             }
             break;
-                
+
             /* ------------------------------------------------------------------
              * SECTION 2:
              * ------------------------------------------------------------------
@@ -201,8 +202,8 @@ void Data::parseLines(ifstream &dataFile) {
                 currentLocation->appendToShortDescription(lineVector.at(1));
             }
             break;
-                
-                
+
+
             /* ------------------------------------------------------------------
              * SECTION 3:
              * ------------------------------------------------------------------
@@ -239,9 +240,9 @@ void Data::parseLines(ifstream &dataFile) {
              C	CASE HE GOES TO 9.  VERB 50 TAKES HIM TO 9 REGARDLESS OF PROP(3).
              */
             case 3:
-                
+
             break;
-            
+
             /* ------------------------------------------------------------------
              * SECTION 4:
              * ------------------------------------------------------------------
@@ -256,7 +257,7 @@ void Data::parseLines(ifstream &dataFile) {
             case 4:
             {
                 int M = idNumber/1000;
-                
+
                 if (currentWord == NULL || idNumber != currentWord->getNumber()) {
                     // Check what type of word it is and create an appropriate object
                     if (M == 0) {
@@ -272,20 +273,20 @@ void Data::parseLines(ifstream &dataFile) {
                     } else if (M == 3) {
                         currentWord = new SpecialCaseVerb(idNumber, lineVector.at(1));
                     }
-                    
+
                     // Add the word to our vector
                     this->words->push_back(currentWord);
                 } else {
                     currentWord->addWord(lineVector.at(1));
                 }
-                
+
                 // If a comment is supplied, add it to the word
                 if (lineVector.size() > 2) {
                     currentWord->setComment(lineVector.at(2));
                 }
             }
             break;
-                
+
             /* ------------------------------------------------------------------
              * SECTION 5:
              * ------------------------------------------------------------------
@@ -319,7 +320,7 @@ void Data::parseLines(ifstream &dataFile) {
                 }
             }
             break;
-            
+
             /* ------------------------------------------------------------------
              * SECTION 6:
              * ------------------------------------------------------------------
@@ -336,7 +337,7 @@ void Data::parseLines(ifstream &dataFile) {
                 }
             }
             break;
-                
+
             /* ------------------------------------------------------------------
              * SECTION 7:
              * ------------------------------------------------------------------
@@ -375,7 +376,7 @@ void Data::parseLines(ifstream &dataFile) {
                 }
             }
             break;
-                
+
             /* ------------------------------------------------------------------
              * SECTION 8:
              * ------------------------------------------------------------------
@@ -396,10 +397,10 @@ void Data::parseLines(ifstream &dataFile) {
                 if (currentMessage != NULL) {
                     currentActionVerb->setDefaultMessage(currentMessage);
                 }
-                
+
             }
             break;
-                
+
             /* ------------------------------------------------------------------
              * SECTION 9:
              * ------------------------------------------------------------------
@@ -422,10 +423,10 @@ void Data::parseLines(ifstream &dataFile) {
              */
             case 9:
             {
-                
+
             }
             break;
-                
+
             /* ------------------------------------------------------------------
              * SECTION 10:
              * ------------------------------------------------------------------
@@ -441,11 +442,11 @@ void Data::parseLines(ifstream &dataFile) {
                 this->classMessages->push_back(new ClassMessage(idNumber, lineVector.at(1)));
             }
             break;
-                
+
             /* ------------------------------------------------------------------
              * SECTION 11:
              * ------------------------------------------------------------------
-             C HINTS.  EACH LINE CONTAINS A 
+             C HINTS.  EACH LINE CONTAINS A
                 - HINT NUMBER (CORRESPONDING TO A COND BIT, SEE SECTION 9)
                 - THE NUMBER OF TURNS HE MUST BE AT THE RIGHT LOC(S) BEFORE TRIGGERING THE HINT
                 - THE POINTS DEDUCTED FOR TAKING THE HINT
@@ -462,12 +463,12 @@ void Data::parseLines(ifstream &dataFile) {
             {
                 Message* question = this->getMessageByNumber(atoi(lineVector.at(3).c_str()));
                 Message* hint = this->getMessageByNumber(atoi(lineVector.at(4).c_str()));
-                
+
                 // For debugging
                 if ((atoi(lineVector.at(3).c_str()) != 0 && question == NULL) || (atoi(lineVector.at(4).c_str()) != 0 && hint == NULL)) {
                     cout << "ERROR: Section 11.1: Could not find question or hint message." << endl;
                 }
-                
+
                 this->hints->push_back(new Hint(
                     atoi(lineVector.at(0).c_str()),
                     atoi(lineVector.at(1).c_str()),
@@ -477,7 +478,7 @@ void Data::parseLines(ifstream &dataFile) {
                 ));
             }
             break;
-                
+
             /* ------------------------------------------------------------------
              * SECTION 12:
              * ------------------------------------------------------------------
@@ -494,7 +495,7 @@ void Data::parseLines(ifstream &dataFile) {
                 currentMessage->appendContent(lineVector.at(1));
             }
             break;
-                
+
             /* ------------------------------------------------------------------
              * SECTION 0:
              * ------------------------------------------------------------------
@@ -570,29 +571,29 @@ const string Data::trim(const string& pString, const string& pWhitespace) {
         // no content
         return "";
     }
-    
+
     const size_t endStr = pString.find_last_not_of(pWhitespace);
     const size_t range = endStr - beginStr + 1;
-    
+
     return pString.substr(beginStr, range);
 }
 
 const string Data::reduce(const string& pString, const string& pFill, const string& pWhitespace) {
     // trim first
     string result(trim(pString, pWhitespace));
-    
+
     // replace sub ranges
     size_t beginSpace = result.find_first_of(pWhitespace);
     while (beginSpace != string::npos) {
         const size_t endSpace = result.find_first_not_of(pWhitespace, beginSpace);
         const size_t range = endSpace - beginSpace;
-        
+
         result.replace(beginSpace, range, pFill);
-        
+
         const size_t newStart = beginSpace + pFill.length();
         beginSpace = result.find_first_of(pWhitespace, newStart);
     }
-    
+
     return result;
 }*/
 
