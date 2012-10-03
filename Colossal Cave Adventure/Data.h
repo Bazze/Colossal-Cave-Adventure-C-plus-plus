@@ -21,6 +21,7 @@
 #include "ClassMessage.h"
 #include "MagicMessage.h"
 #include "ActionVerb.h"
+#include "MotionVerb.h"
 #include "Hint.h"
 
 
@@ -45,6 +46,7 @@ private:
     Object* getObjectByNumber(const int n);
     Location* getLocationByNumber(const int n);
     ActionVerb* getActionVerbByNumber(const int n);
+    MotionVerb* getMotionVerbByNumber(const int n);
     Message* getMessageByNumber(const int n);
     
     void deallocLocations();

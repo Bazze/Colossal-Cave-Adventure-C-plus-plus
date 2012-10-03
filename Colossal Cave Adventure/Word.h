@@ -23,10 +23,13 @@ private:
     string comment;
     
 public:
+    Word();
     Word(int number, string word, string comment = "");
     virtual ~Word();
     
-    int getNumber();
+    //Word(const Word& source);
+    
+    const int getNumber() const;
     void setNumber(int number);
     
     string getWords();

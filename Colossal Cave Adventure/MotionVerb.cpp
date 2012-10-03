@@ -12,6 +12,10 @@ MotionVerb::MotionVerb(int number, string word, string comment) : Word(number, w
     
 }
 
+MotionVerb::MotionVerb(int number) : Word(number, "", "") {
+    
+}
+
 MotionVerb::~MotionVerb() {
     
 }

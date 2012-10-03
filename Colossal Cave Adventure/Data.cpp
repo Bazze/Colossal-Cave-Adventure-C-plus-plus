@@ -105,7 +105,7 @@ void Data::loadData(const string filename) {
     //this->dumpAllMessages();
     //this->dumpAllClassMessages();
     //this->dumpAllHints();
-    this->dumpAllMagicMessages();
+    //this->dumpAllMagicMessages();
 }
 
 void Data::parseLines(ifstream &dataFile) {
@@ -122,7 +122,9 @@ void Data::parseLines(ifstream &dataFile) {
     //int currentLocation = -1;
 
     Location* currentLocation = NULL;
+    Location* accessibleLocation = NULL;
     Word* currentWord = NULL;
+    MotionVerb* currentMotionVerb = NULL;
     Object* currentObject = NULL;
     Message* currentMessage = NULL;
     ActionVerb* currentActionVerb = NULL;
@@ -148,7 +150,9 @@ void Data::parseLines(ifstream &dataFile) {
             currentSection = -1;
             idNumber = -1;
             currentLocation = NULL;
+            accessibleLocation = NULL;
             currentWord = NULL;
+            currentMotionVerb = NULL;
             currentObject = NULL;
             currentMessage = NULL;
             currentActionVerb = NULL;
@@ -240,7 +244,49 @@ void Data::parseLines(ifstream &dataFile) {
              C	CASE HE GOES TO 9.  VERB 50 TAKES HIM TO 9 REGARDLESS OF PROP(3).
              */
             case 3:
-
+            {
+                bool newLoc = false;
+                int N = atoi(lineVector.at(1).c_str());
+                
+                if (currentLocation == NULL || idNumber != currentLocation->getNumber()) {
+                    newLoc = true;
+                    currentLocation = this->getLocationByNumber(idNumber);
+                    if (currentLocation == NULL) {
+                        // For debugging
+                        cout << "ERROR: Section 3.1: Location not found: " << idNumber << endl;
+                    }
+                }
+                
+                // TODO: N==0? What to do? What does it mean?
+                // IF N<=300	IT IS THE LOCATION TO GO TO.
+                if (N > 0 && N < 300) {
+                    if (accessibleLocation == NULL || N != accessibleLocation->getNumber() || newLoc) {
+                        accessibleLocation = this->getLocationByNumber(N);
+                        
+                        // For debugging
+                        if (accessibleLocation == NULL) {
+                            cout << "ERROR: Section 3.2: Location not found: " << N << endl;
+                        }
+                        
+                        // Add the accessible Location
+                        currentLocation->addAccessibleLocation(accessibleLocation);
+                        
+                        // Add the possible MotionVerbs which can be used to go to this location
+                        int verbNr = -1;
+                        for (int i = 2; i < lineVector.size(); i++) {
+                            verbNr = atoi(lineVector.at(i).c_str());
+                            currentMotionVerb = this->getMotionVerbByNumber(verbNr);
+                            
+                            if (currentMotionVerb == NULL) {
+                                currentMotionVerb = new MotionVerb(verbNr);
+                                this->words->push_back(currentMotionVerb);
+                            }
+                            
+                            currentLocation->addMotionVerb(accessibleLocation, currentMotionVerb);
+                        }
+                    }
+                }
+            }
             break;
 
             /* ------------------------------------------------------------------
@@ -259,9 +305,18 @@ void Data::parseLines(ifstream &dataFile) {
                 int M = idNumber/1000;
 
                 if (currentWord == NULL || idNumber != currentWord->getNumber()) {
+                    bool push = true;
                     // Check what type of word it is and create an appropriate object
                     if (M == 0) {
-                        currentWord = new MotionVerb(idNumber, lineVector.at(1));
+                        // Since some MotionVerbs were created in the previous section,
+                        // we need to make sure grab the old one and don't create a duplicate
+                        currentWord = this->getMotionVerbByNumber(idNumber);
+                        if (currentWord == NULL) {
+                            currentWord = new MotionVerb(idNumber, lineVector.at(1));
+                        } else {
+                            currentWord->addWord(lineVector.at(1));
+                            push = false;
+                        }
                     } else if (M == 1) {
                         currentWord = new Object(idNumber, lineVector.at(1));
                         // OBJECTS FROM 50 TO 79 ARE CONSIDERED TREASURES
@@ -274,8 +329,10 @@ void Data::parseLines(ifstream &dataFile) {
                         currentWord = new SpecialCaseVerb(idNumber, lineVector.at(1));
                     }
 
-                    // Add the word to our vector
-                    this->words->push_back(currentWord);
+                    // Add the word to our vector if needed (not needed for MotionVerbs already existing)
+                    if (push) {
+                        this->words->push_back(currentWord);
+                    }
                 } else {
                     currentWord->addWord(lineVector.at(1));
                 }
@@ -535,6 +592,17 @@ ActionVerb* Data::getActionVerbByNumber(const int n) {
         if (dynamic_cast<ActionVerb*>(this->words->at(i)) != NULL) {
             ActionVerb *o = (ActionVerb*)this->words->at(i);
             if (o->getNumber()%2000 == n) {
+                return o;
+            }
+        }
+    }
+    return NULL;
+}
+MotionVerb* Data::getMotionVerbByNumber(const int n) {
+    for (int i = 0; i < this->words->size(); i++) {
+        if (dynamic_cast<MotionVerb*>(this->words->at(i)) != NULL) {
+            MotionVerb* o = (MotionVerb*)this->words->at(i);
+            if (o->getNumber() == n) {
                 return o;
             }
         }

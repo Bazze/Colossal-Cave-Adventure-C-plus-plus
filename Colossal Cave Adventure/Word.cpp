@@ -10,17 +10,35 @@
 
 #include "Word.h"
 
+
+Word::Word() {
+    this->number = 0;
+    this->words = new vector<string>();
+    this->comment = "";
+}
 Word::Word(int number, string word, string comment) {
     this->number = number;
     this->words = new vector<string>();
-    this->words->push_back(word);
+    if (word != "") {
+        this->words->push_back(word);
+    }
     this->comment = comment;
 }
 Word::~Word() {
     delete this->words;
 }
 
-int Word::getNumber() {
+/*Word::Word(const Word& source) {
+    cout << "called" << endl;
+    this->number = source.number;
+    this->words = new vector<string>();
+    for (int i = 0; i < source.words->size(); i++) {
+        this->words->push_back(source.words->at(i));
+    }
+    this->comment = source.comment;
+}*/
+
+const int Word::getNumber() const {
     return this->number;
 }
 void Word::setNumber(int number) {

@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "MotionVerb.h"
 
 #include "Object.h"
 
@@ -26,11 +27,15 @@ private:
     
     vector<Object*> *objects;
     vector<bool> assets;
+    vector<vector<MotionVerb*>*>* motionVerbs;
+    
+    vector<Location*> *accessibleLocations;
     
     void init(int number = -1, string longDescription = "", string shortDescription = "");
     
-    //void deallocObjects();
     const string listObjects();
+    
+    const int getAccessibleLocationIndex(Location* loc) const;
     
 public:
     Location();
@@ -39,7 +44,7 @@ public:
     Location(int number, string longDescription, string shortDescription);
     ~Location();
     
-    const int getNumber();
+    const int getNumber() const;
     void setNumber(const int number);
     
     const string getShortDescription();
@@ -53,8 +58,13 @@ public:
     void addObject(Object* obj);
     
     void setAsset(const int index, const bool value = true);
+    
+    void addAccessibleLocation(Location* loc);
+    void addMotionVerb(Location* loc, MotionVerb* verb);
+    
+    const string getAccessibleLocationsAndMotionVerbsAsString();
 
-    string toString();
+    const string toString();
 };
 
 #endif /* defined(__Colossal_Cave_Adventure__Location__) */

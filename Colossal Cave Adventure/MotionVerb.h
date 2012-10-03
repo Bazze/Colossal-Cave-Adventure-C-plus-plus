@@ -20,6 +20,7 @@ private:
     
 public:
     MotionVerb(int number, string word, string comment = "");
+    MotionVerb(int number);
     ~MotionVerb();
     
     const string toString();
