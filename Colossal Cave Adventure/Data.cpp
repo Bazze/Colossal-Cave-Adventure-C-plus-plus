@@ -86,7 +86,9 @@ void Data::deallocHints() {
 
 void Data::loadData(const string filename) {
     // Declare and open file stream
-    ifstream dataFile(filename, ios::in);
+    ifstream dataFile;
+    
+    dataFile.open(filename, ios::in);
     
     // If the file was successfully opened, start processing
     if (dataFile.is_open()) {
@@ -487,6 +489,7 @@ void Data::parseLines(ifstream &dataFile) {
             {
                 if (currentMessage == NULL || idNumber != currentMessage->getNumber()) {
                     currentMessage = new MagicMessage(idNumber);
+                    this->magicMessages->push_back((MagicMessage*)currentMessage);
                 }
                 currentMessage->appendContent(lineVector.at(1));
             }
