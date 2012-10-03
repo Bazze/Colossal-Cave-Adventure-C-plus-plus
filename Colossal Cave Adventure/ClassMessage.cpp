@@ -13,7 +13,9 @@
 ClassMessage::ClassMessage(const int number, const string content) : Message(number, content) {
     
 }
-
+ClassMessage::ClassMessage(const int number) : Message(number) {
+    
+}
 ClassMessage::~ClassMessage() {
     
 }

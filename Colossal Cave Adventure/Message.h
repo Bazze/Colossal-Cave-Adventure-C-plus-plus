@@ -22,6 +22,7 @@ private:
     
 public:
     Message(const int number, const string content);
+    Message(const int number);
     virtual ~Message();
     
     const int getNumber();

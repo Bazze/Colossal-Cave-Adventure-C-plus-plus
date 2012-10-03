@@ -25,6 +25,7 @@ private:
     string longDescription;
     
     vector<Object*> *objects;
+    vector<bool> assets;
     
     void init(int number = -1, string longDescription = "", string shortDescription = "");
     
@@ -50,6 +51,8 @@ public:
     void appendToLongDescription(const string desc);
     
     void addObject(Object* obj);
+    
+    void setAsset(const int index, const bool value = true);
 
     string toString();
 };

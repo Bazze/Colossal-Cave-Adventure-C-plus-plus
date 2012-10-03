@@ -11,6 +11,7 @@
 
 #include <sstream>
 #include <vector>
+#include <iostream>
 
 Location::Location() {
     this->init();
@@ -36,6 +37,10 @@ void Location::init(int number, string longDescription, string shortDescription)
     this->longDescription = longDescription;
     this->shortDescription = shortDescription;
     this->objects = new vector<Object*>();
+    this->assets = vector<bool>();
+    for (int i = 0; i < 10; i++) {
+        this->assets.push_back(false);
+    }
 }
 
 /*
@@ -73,10 +78,19 @@ void Location::setLongDescription(const string desc) {
 void Location::appendToLongDescription(const string desc) {
     this->longDescription += desc + " ";
 }
+
 void Location::addObject(Object* obj) {
     this->objects->push_back(obj);
 }
 
+void Location::setAsset(const int index, const bool value) {
+    if (index >= 0 && index < 10) {
+        this->assets.at(index) = value;
+    } else {
+        // For debugging
+        cout << "ERROR: Location class: asset index out of bounds" << endl;
+    }
+}
 const string Location::listObjects() {
     stringstream s;
     if (this->objects->size() > 0) {

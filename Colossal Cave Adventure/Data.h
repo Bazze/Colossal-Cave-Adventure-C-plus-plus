@@ -19,6 +19,7 @@
 #include "Object.h"
 #include "Message.h"
 #include "ClassMessage.h"
+#include "MagicMessage.h"
 #include "ActionVerb.h"
 #include "Hint.h"
 
@@ -31,6 +32,7 @@ private:
     vector<Location*> *locations;
     vector<Word*> *words;
     vector<Message*> *messages;
+    vector<MagicMessage*> *magicMessages;
     vector<ClassMessage*> *classMessages;
     vector<Hint*> *hints;
     
@@ -48,6 +50,7 @@ private:
     void deallocLocations();
     void deallocWords();
     void deallocMessages();
+    void deallocMagicMessages();
     void deallocClassMessages();
     void deallocHints();
     
@@ -61,8 +64,10 @@ public:
     void dumpAllLocations();
     void dumpAllWords();
     void dumpAllMessages();
+    void dumpAllMagicMessages();
     void dumpAllClassMessages();
     void dumpAllHints();
+    
 };
 
 #endif /* defined(__Colossal_Cave_Adventure__Data__) */

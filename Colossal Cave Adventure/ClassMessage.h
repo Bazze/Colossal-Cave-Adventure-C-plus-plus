@@ -19,6 +19,7 @@ private:
     
 public:
     ClassMessage(const int number, const string content);
+    ClassMessage(const int number);
     ~ClassMessage();
     
     const string toString();

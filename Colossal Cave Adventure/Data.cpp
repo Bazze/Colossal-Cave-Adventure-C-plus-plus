@@ -33,6 +33,7 @@ Data::Data() {
     this->locations = new vector<Location*>();
     this->words = new vector<Word*>();
     this->messages = new vector<Message*>();
+    this->magicMessages = new vector<MagicMessage*>();
     this->classMessages = new vector<ClassMessage*>();
     this->hints = new vector<Hint*>();
 }
@@ -41,6 +42,7 @@ Data::~Data() {
     this->deallocLocations();
     this->deallocWords();
     this->deallocMessages();
+    this->deallocMagicMessages();
     this->deallocClassMessages();
     this->deallocHints();
 }
@@ -62,6 +64,12 @@ void Data::deallocMessages() {
         delete this->messages->at(i);
     }
     delete this->messages;
+}
+void Data::deallocMagicMessages() {
+    for (int i = 0; i < this->magicMessages->size(); i++) {
+        delete this->magicMessages->at(i);
+    }
+    delete this->magicMessages;
 }
 void Data::deallocClassMessages() {
     for (int i = 0; i < this->classMessages->size(); i++) {
@@ -93,7 +101,8 @@ void Data::loadData(const string filename) {
     //this->dumpAllWords();
     //this->dumpAllMessages();
     //this->dumpAllClassMessages();
-    this->dumpAllHints();
+    //this->dumpAllHints();
+    this->dumpAllMagicMessages();
 }
 
 void Data::parseLines(ifstream &dataFile) {
@@ -452,6 +461,7 @@ void Data::parseLines(ifstream &dataFile) {
                 Message* question = this->getMessageByNumber(atoi(lineVector.at(3).c_str()));
                 Message* hint = this->getMessageByNumber(atoi(lineVector.at(4).c_str()));
                 
+                // For debugging
                 if ((atoi(lineVector.at(3).c_str()) != 0 && question == NULL) || (atoi(lineVector.at(4).c_str()) != 0 && hint == NULL)) {
                     cout << "ERROR: Section 11.1: Could not find question or hint message." << endl;
                 }
@@ -475,7 +485,10 @@ void Data::parseLines(ifstream &dataFile) {
              */
             case 12:
             {
-                
+                if (currentMessage == NULL || idNumber != currentMessage->getNumber()) {
+                    currentMessage = new MagicMessage(idNumber);
+                }
+                currentMessage->appendContent(lineVector.at(1));
             }
             break;
                 
@@ -594,6 +607,11 @@ void Data::dumpAllWords() {
 void Data::dumpAllMessages() {
     for (int i = 0; i < this->messages->size(); i++) {
         cout << this->messages->at(i)->toString() << endl;
+    }
+}
+void Data::dumpAllMagicMessages() {
+    for (int i = 0; i < this->magicMessages->size(); i++) {
+        cout << this->magicMessages->at(i)->toString() << endl;
     }
 }
 void Data::dumpAllClassMessages() {

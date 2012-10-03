@@ -14,6 +14,10 @@ Message::Message(const int number, const string content) {
     this->number = number;
     this->content = content;
 }
+Message::Message(const int number) {
+    this->number = number;
+    this->content = "";
+}
 Message::~Message() {
     
 }
