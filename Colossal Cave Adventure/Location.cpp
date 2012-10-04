@@ -2,8 +2,8 @@
 //  Location.cpp
 //  Colossal Cave Adventure
 //
-//  Created by Sebastian Norling on 2012-09-29.
-//  Copyright (c) 2012 SN Solutions. All rights reserved.
+//  Created by Sebastian Norling and Niclas Björner on 2012-09-29.
+//  Copyright (c) 2012. All rights reserved.
 //
 
 #include "Location.h"
@@ -194,9 +194,17 @@ const string Location::getPrintMessagesAndMotionVerbsAsString() {
     }
     return ss.str();
 }
+const string Location::getAssetsAsString() {
+    stringstream ss;
+    ss << "Assets:" << endl;
+    for (int i = 0; i < this->assets.size(); i++) {
+        ss << "\t" << i << ": " << (this->assets.at(i) ? "true" : "false") << endl;
+    }
+    return ss.str();
+}
 
 const string Location::toString() {
     stringstream s;
-    s << "Id: " << this->getNumber() << endl << "Short description:" << endl << (this->getShortDescription() == "" ? "<empty>" : this->getShortDescription()) << endl << "Long description:" << endl << this->getLongDescription() << endl << "Objects:" << endl << this->listObjects() << endl << this->getAccessibleLocationsAndMotionVerbsAsString() << this->getPrintMessagesAndMotionVerbsAsString();
+    s << "Id: " << this->getNumber() << endl << "Short description:" << endl << (this->getShortDescription() == "" ? "<empty>" : this->getShortDescription()) << endl << "Long description:" << endl << this->getLongDescription() << endl << "Objects:" << endl << this->listObjects() << endl << this->getAccessibleLocationsAndMotionVerbsAsString() << this->getPrintMessagesAndMotionVerbsAsString() << this->getAssetsAsString();
     return s.str();
 }

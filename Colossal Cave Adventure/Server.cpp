@@ -2,8 +2,8 @@
 //  Server.cpp
 //  Colossal Cave Adventure
 //
-//  Created by Niclas Björner on 10/4/12.
-//  Copyright (c) 2012 SN Solutions. All rights reserved.
+//  Created by Sebastian Norling and Niclas Björner on 2012-09-29.
+//  Copyright (c) 2012. All rights reserved.
 //
 
 

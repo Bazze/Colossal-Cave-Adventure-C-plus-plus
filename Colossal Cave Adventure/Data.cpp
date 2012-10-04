@@ -2,9 +2,8 @@
 //  Data.cpp
 //  Colossal Cave Adventure
 //
-//  Created by Sebastian Norling on 2012-09-29.
-//  Contributer Niclas Björner joined on 2012-10-03
-//  Copyright (c) 2012 SN Solutions. All rights reserved.
+//  Created by Sebastian Norling and Niclas Björner on 2012-09-29.
+//  Copyright (c) 2012. All rights reserved.
 //
 
 #include "Data.h"
@@ -101,7 +100,7 @@ void Data::loadData(const string filename) {
         // Close file stream
         dataFile.close();
     }
-    this->dumpAllLocations();
+    //this->dumpAllLocations();
     //this->dumpAllWords();
     //this->dumpAllMessages();
     //this->dumpAllClassMessages();
@@ -513,7 +512,16 @@ void Data::parseLines(ifstream &dataFile) {
              */
             case 9:
             {
-
+                for (int i = 1; i < lineVector.size(); i++) {
+                    currentLocation = this->getLocationByNumber(atoi(lineVector.at(i).c_str()));
+                    
+                    // For debugging
+                    if (currentLocation == NULL) {
+                        cout << "ERROR: Section 9.1: Could not find location" << endl;
+                    }
+                    
+                    currentLocation->setAsset(idNumber, true);
+                }
             }
             break;
 
