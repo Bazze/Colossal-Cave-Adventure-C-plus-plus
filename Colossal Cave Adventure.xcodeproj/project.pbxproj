@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		7973F946161DAACE00F6C4A5 /* PracticalSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7973F944161DAACE00F6C4A5 /* PracticalSocket.cpp */; };
-		79954794161D9CDD0045318D /* Server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79954792161D9CDD0045318D /* Server.cpp */; };
 		A9AB95C116171648006E3FCF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A9AB95C016171648006E3FCF /* main.cpp */; };
 		A9AB95C316171648006E3FCF /* Colossal_Cave_Adventure.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = A9AB95C216171648006E3FCF /* Colossal_Cave_Adventure.1 */; };
 		A9AB95DD16171EAF006E3FCF /* Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A9AB95DB16171EAF006E3FCF /* Data.cpp */; };
@@ -49,7 +48,6 @@
 /* Begin PBXFileReference section */
 		7973F944161DAACE00F6C4A5 /* PracticalSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PracticalSocket.cpp; sourceTree = "<group>"; };
 		7973F945161DAACE00F6C4A5 /* PracticalSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PracticalSocket.h; sourceTree = "<group>"; };
-		79954792161D9CDD0045318D /* Server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Server.cpp; sourceTree = "<group>"; };
 		A9AB95BC16171648006E3FCF /* Colossal Cave Adventure */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Colossal Cave Adventure"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9AB95C016171648006E3FCF /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		A9AB95C216171648006E3FCF /* Colossal_Cave_Adventure.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Colossal_Cave_Adventure.1; sourceTree = "<group>"; };
@@ -100,7 +98,6 @@
 		79954790161D9CC40045318D /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				79954792161D9CDD0045318D /* Server.cpp */,
 				7973F944161DAACE00F6C4A5 /* PracticalSocket.cpp */,
 				7973F945161DAACE00F6C4A5 /* PracticalSocket.h */,
 			);
@@ -254,7 +251,6 @@
 				A9D70446161B0ED30000B455 /* ClassMessage.cpp in Sources */,
 				A9D70449161B1F080000B455 /* Hint.cpp in Sources */,
 				A9D7044C161C23C00000B455 /* MagicMessage.cpp in Sources */,
-				79954794161D9CDD0045318D /* Server.cpp in Sources */,
 				7973F946161DAACE00F6C4A5 /* PracticalSocket.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
