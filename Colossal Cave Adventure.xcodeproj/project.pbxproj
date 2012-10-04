@@ -11,8 +11,6 @@
 		79954794161D9CDD0045318D /* Server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 79954792161D9CDD0045318D /* Server.cpp */; };
 		A9AB95C116171648006E3FCF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A9AB95C016171648006E3FCF /* main.cpp */; };
 		A9AB95C316171648006E3FCF /* Colossal_Cave_Adventure.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = A9AB95C216171648006E3FCF /* Colossal_Cave_Adventure.1 */; };
-		A9AB95D1161716B4006E3FCF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A9AB95D0161716B4006E3FCF /* main.cpp */; };
-		A9AB95D3161716B4006E3FCF /* Colossal_Cave_Adventure_Client.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = A9AB95D2161716B4006E3FCF /* Colossal_Cave_Adventure_Client.1 */; };
 		A9AB95DD16171EAF006E3FCF /* Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A9AB95DB16171EAF006E3FCF /* Data.cpp */; };
 		A9AB95E2161738BE006E3FCF /* Location.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A9AB95E0161738BE006E3FCF /* Location.cpp */; };
 		A9AB95E516175AB8006E3FCF /* Word.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A9AB95E316175AB8006E3FCF /* Word.cpp */; };
@@ -43,7 +41,6 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
-				A9AB95D3161716B4006E3FCF /* Colossal_Cave_Adventure_Client.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -57,8 +54,6 @@
 		A9AB95C016171648006E3FCF /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		A9AB95C216171648006E3FCF /* Colossal_Cave_Adventure.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Colossal_Cave_Adventure.1; sourceTree = "<group>"; };
 		A9AB95CD161716B4006E3FCF /* Colossal Cave Adventure Client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Colossal Cave Adventure Client"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A9AB95D0161716B4006E3FCF /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		A9AB95D2161716B4006E3FCF /* Colossal_Cave_Adventure_Client.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Colossal_Cave_Adventure_Client.1; sourceTree = "<group>"; };
 		A9AB95DB16171EAF006E3FCF /* Data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Data.cpp; sourceTree = "<group>"; };
 		A9AB95DC16171EAF006E3FCF /* Data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Data.h; sourceTree = "<group>"; };
 		A9AB95DE16172429006E3FCF /* advent.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = advent.dat; sourceTree = "<group>"; };
@@ -116,7 +111,6 @@
 			isa = PBXGroup;
 			children = (
 				A9AB95BF16171648006E3FCF /* Colossal Cave Adventure */,
-				A9AB95CF161716B4006E3FCF /* Colossal Cave Adventure Client */,
 				A9AB95BD16171648006E3FCF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -152,15 +146,6 @@
 				A9AB95E916175F0F006E3FCF /* Words */,
 			);
 			path = "Colossal Cave Adventure";
-			sourceTree = "<group>";
-		};
-		A9AB95CF161716B4006E3FCF /* Colossal Cave Adventure Client */ = {
-			isa = PBXGroup;
-			children = (
-				A9AB95D0161716B4006E3FCF /* main.cpp */,
-				A9AB95D2161716B4006E3FCF /* Colossal_Cave_Adventure_Client.1 */,
-			);
-			path = "Colossal Cave Adventure Client";
 			sourceTree = "<group>";
 		};
 		A9AB95DF16172431006E3FCF /* Resources */ = {
@@ -278,7 +263,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A9AB95D1161716B4006E3FCF /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
