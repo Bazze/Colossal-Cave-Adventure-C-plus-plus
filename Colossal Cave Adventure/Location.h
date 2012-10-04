@@ -13,8 +13,8 @@
 #include <string>
 #include <vector>
 #include "MotionVerb.h"
-
 #include "Object.h"
+#include "Message.h"
 
 using namespace std;
 
@@ -27,15 +27,23 @@ private:
     
     vector<Object*> *objects;
     vector<bool> assets;
-    vector<vector<MotionVerb*>*>* motionVerbs;
     
     vector<Location*> *accessibleLocations;
+    vector<vector<MotionVerb*>*> *motionVerbs;
+    
+    vector<Message*> *printMessages;
+    vector<vector<MotionVerb*>*> *motionVerbsForPrintingMessage;
     
     void init(int number = -1, string longDescription = "", string shortDescription = "");
     
-    const string listObjects();
+    
     
     const int getAccessibleLocationIndex(Location* loc) const;
+    const int getPrintMessageIndex(Message* msg) const;
+    
+    const string listObjects();
+    const string getAccessibleLocationsAndMotionVerbsAsString();
+    const string getPrintMessagesAndMotionVerbsAsString();
     
 public:
     Location();
@@ -62,8 +70,9 @@ public:
     void addAccessibleLocation(Location* loc);
     void addMotionVerb(Location* loc, MotionVerb* verb);
     
-    const string getAccessibleLocationsAndMotionVerbsAsString();
-
+    void addPrintMessage(Message* msg);
+    void addMotionVerbForPrintMessage(Message* msg, MotionVerb* verb);
+    
     const string toString();
 };
 

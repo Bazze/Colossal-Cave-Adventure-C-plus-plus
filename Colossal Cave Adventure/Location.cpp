@@ -37,6 +37,8 @@ void Location::init(int number, string longDescription, string shortDescription)
     }
     this->motionVerbs = new vector<vector<MotionVerb*>*>();
     this->accessibleLocations = new vector<Location*>();
+    this->motionVerbsForPrintingMessage = new vector<vector<MotionVerb*>*>();
+    this->printMessages = new vector<Message*>();
 }
 
 Location::~Location() {
@@ -44,8 +46,15 @@ Location::~Location() {
         delete this->motionVerbs->at(i);
     }
     delete this->motionVerbs;
-    delete this->objects;
     delete this->accessibleLocations;
+    
+    for (int i = 0; i < this->motionVerbsForPrintingMessage->size(); i++) {
+        delete this->motionVerbsForPrintingMessage->at(i);
+    }
+    delete this->motionVerbsForPrintingMessage;
+    delete this->printMessages;
+    
+    delete this->objects;
 }
 
 const int Location::getNumber() const {
@@ -90,21 +99,27 @@ void Location::setAsset(const int index, const bool value) {
 
 // Returns the index of the newly added location
 void Location::addAccessibleLocation(Location* loc) {
-    this->accessibleLocations->push_back(loc);
-    this->motionVerbs->push_back(new vector<MotionVerb*>());
+    // Only add if not already added
+    if (this->getAccessibleLocationIndex(loc) == -1) {
+        this->accessibleLocations->push_back(loc);
+        this->motionVerbs->push_back(new vector<MotionVerb*>());
+    }
 }
 void Location::addMotionVerb(Location* loc, MotionVerb* verb) {
     int index = this->getAccessibleLocationIndex(loc);
     this->motionVerbs->at(index)->push_back(verb);
-    /*if (index != -1) {
-        // If no words have been added for this location, initialize new vector first
-        if (this->motionVerbs->size() <= index) {
-            this->motionVerbs->push_back(new vector<MotionVerb*>());
-        }
-        this->motionVerbs->at(index)->push_back(verb);
-    } else {
-        cout << "ERROR: Location class: addMotionVerb(): location not found." << endl;
-    }*/
+}
+
+void Location::addPrintMessage(Message* msg) {
+    // Only add if not alread added
+    if (this->getPrintMessageIndex(msg)) {
+        this->printMessages->push_back(msg);
+        this->motionVerbsForPrintingMessage->push_back(new vector<MotionVerb*>());
+    }
+}
+void Location::addMotionVerbForPrintMessage(Message* msg, MotionVerb* verb) {
+    int index = this->getPrintMessageIndex(msg);
+    this->motionVerbsForPrintingMessage->at(index)->push_back(verb);
 }
 
 const string Location::listObjects() {
@@ -125,6 +140,14 @@ const string Location::listObjects() {
 const int Location::getAccessibleLocationIndex(Location* loc) const {
     for (int i = 0; i < this->accessibleLocations->size(); i++) {
         if (this->accessibleLocations->at(i)->getNumber() == loc->getNumber()) {
+            return i;
+        }
+    }
+    return -1;
+}
+const int Location::getPrintMessageIndex(Message *msg) const {
+    for (int i = 0; i < this->printMessages->size(); i++) {
+        if (this->printMessages->at(i)->getNumber() == msg->getNumber()) {
             return i;
         }
     }
@@ -151,9 +174,29 @@ const string Location::getAccessibleLocationsAndMotionVerbsAsString() {
     }
     return ss.str();
 }
+const string Location::getPrintMessagesAndMotionVerbsAsString() {
+    stringstream ss;
+    ss << "Print messages:" << endl;
+    if (this->printMessages->size() > 0) {
+        for (int i = 0; i < this->printMessages->size(); i++) {
+            ss << this->printMessages->at(i)->getNumber() << " [" << this->printMessages->at(i)->getContent() << "]" << endl;
+            ss << "\tMotionVerbs:" << endl;
+            if (this->motionVerbsForPrintingMessage->at(i)->size() > 0) {
+                for (int x = 0; x < this->motionVerbsForPrintingMessage->at(i)->size(); x++) {
+                    ss << "\t\t" << this->motionVerbsForPrintingMessage->at(i)->at(x)->getNumber() << ": " << this->motionVerbsForPrintingMessage->at(i)->at(x)->getWords() << endl;
+                }
+            } else {
+                ss << "\t" << "<none>" << endl;
+            }
+        }
+    } else {
+        ss << "<none>" << endl;
+    }
+    return ss.str();
+}
 
 const string Location::toString() {
     stringstream s;
-    s << "Id: " << this->getNumber() << endl << "Short description:" << endl << (this->getShortDescription() == "" ? "<empty>" : this->getShortDescription()) << endl << "Long description:" << endl << this->getLongDescription() << endl << "Objects:" << endl << this->listObjects() << endl << this->getAccessibleLocationsAndMotionVerbsAsString();
+    s << "Id: " << this->getNumber() << endl << "Short description:" << endl << (this->getShortDescription() == "" ? "<empty>" : this->getShortDescription()) << endl << "Long description:" << endl << this->getLongDescription() << endl << "Objects:" << endl << this->listObjects() << endl << this->getAccessibleLocationsAndMotionVerbsAsString() << this->getPrintMessagesAndMotionVerbsAsString();
     return s.str();
 }

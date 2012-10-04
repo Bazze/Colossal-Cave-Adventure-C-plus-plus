@@ -133,7 +133,6 @@
 		A9AB95BF16171648006E3FCF /* Colossal Cave Adventure */ = {
 			isa = PBXGroup;
 			children = (
-				79954790161D9CC40045318D /* Networking */,
 				A9D70444161B0ED20000B455 /* ClassMessage.cpp */,
 				A9D70445161B0ED30000B455 /* ClassMessage.h */,
 				A9AB95C216171648006E3FCF /* Colossal_Cave_Adventure.1 */,
@@ -143,11 +142,12 @@
 				A9D70448161B1F070000B455 /* Hint.h */,
 				A9AB95E0161738BE006E3FCF /* Location.cpp */,
 				A9AB95E1161738BE006E3FCF /* Location.h */,
+				A9D7044A161C23C00000B455 /* MagicMessage.cpp */,
+				A9D7044B161C23C00000B455 /* MagicMessage.h */,
 				A9AB95C016171648006E3FCF /* main.cpp */,
 				A9D7044116188D0A0000B455 /* Message.cpp */,
 				A9D7044216188D0A0000B455 /* Message.h */,
-				A9D7044A161C23C00000B455 /* MagicMessage.cpp */,
-				A9D7044B161C23C00000B455 /* MagicMessage.h */,
+				79954790161D9CC40045318D /* Networking */,
 				A9AB95DF16172431006E3FCF /* Resources */,
 				A9AB95E916175F0F006E3FCF /* Words */,
 			);

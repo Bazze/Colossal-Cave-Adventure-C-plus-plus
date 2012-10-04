@@ -101,7 +101,7 @@ void Data::loadData(const string filename) {
         // Close file stream
         dataFile.close();
     }
-    //this->dumpAllLocations();
+    this->dumpAllLocations();
     //this->dumpAllWords();
     //this->dumpAllMessages();
     //this->dumpAllClassMessages();
@@ -247,7 +247,7 @@ void Data::parseLines(ifstream &dataFile) {
             case 3:
             {
                 bool newLoc = false;
-                int N = atoi(lineVector.at(1).c_str());
+                int N = atoi(lineVector.at(1).c_str())%1000;
                 
                 if (currentLocation == NULL || idNumber != currentLocation->getNumber()) {
                     newLoc = true;
@@ -284,6 +284,32 @@ void Data::parseLines(ifstream &dataFile) {
                             }
                             
                             currentLocation->addMotionVerb(accessibleLocation, currentMotionVerb);
+                        }
+                    }
+                }
+                // IF N>500	MESSAGE N-500 FROM SECTION 6 IS PRINTED, AND HE STAYS WHEREVER HE IS.
+                else if (N > 500) {
+                    if (currentMessage == NULL || N != currentMessage->getNumber() || newLoc) {
+                        currentMessage = this->getMessageByNumber(N-500);
+                        if (currentMessage == NULL) {
+                            currentMessage = new Message(N-500);
+                            this->messages->push_back(currentMessage);
+                        }
+                        
+                        currentLocation->addPrintMessage(currentMessage);
+                        
+                        // Add the possible MotionVerbs which can be used to go to this location
+                        int verbNr = -1;
+                        for (int i = 2; i < lineVector.size(); i++) {
+                            verbNr = atoi(lineVector.at(i).c_str());
+                            currentMotionVerb = this->getMotionVerbByNumber(verbNr);
+                            
+                            if (currentMotionVerb == NULL) {
+                                currentMotionVerb = new MotionVerb(verbNr);
+                                this->words->push_back(currentMotionVerb);
+                            }
+                            
+                            currentLocation->addMotionVerbForPrintMessage(currentMessage, currentMotionVerb);
                         }
                     }
                 }
@@ -388,8 +414,14 @@ void Data::parseLines(ifstream &dataFile) {
             case 6:
             {
                 if (currentMessage == NULL || idNumber != currentMessage->getNumber()) {
-                    currentMessage = new Message(idNumber, lineVector.at(1));
-                    this->messages->push_back(currentMessage);
+                    currentMessage = this->getMessageByNumber(idNumber);
+                    
+                    if (currentMessage == NULL) {
+                        currentMessage = new Message(idNumber, lineVector.at(1));
+                        this->messages->push_back(currentMessage);
+                    } else {
+                        currentMessage->appendContent(lineVector.at(1));
+                    }
                 } else {
                     currentMessage->appendContent(lineVector.at(1));
                 }
