@@ -1,3 +1,5 @@
 *.gch
 *.pro
 *.pro.user
+*/project.xcworkspace
+*/xcuserdata
