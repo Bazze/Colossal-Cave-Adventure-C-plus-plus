@@ -58,6 +58,14 @@ string Word::getWords() {
 void Word::addWord(string word) {
     this->words->push_back(word);
 }
+bool Word::hasWord(string word) const {
+    for (int i = 0; i < this->words->size(); i++) {
+        if (this->words->at(i) == word) {
+            return true;
+        }
+    }
+    return false;
+}
 
 string Word::getComment() {
     return this->comment;

@@ -9,7 +9,7 @@
 #include <iostream>
 #include <pthread.h>
 #include <cstdlib>
-#include "Data.h"
+#include "Game.h"
 #include "PracticalSocket.h"
 
 
@@ -26,11 +26,9 @@ int main(int argc, const char * argv[])
     // insert code here...
     std::cout << "Hello, World!\n";
     
-    Data *data = new Data();
+    Game* game = new Game();
     
-    data->loadData("advent.dat");
-    
-    delete data;
+    delete game;
     
     
     /* The Server Code */

@@ -34,6 +34,7 @@ public:
     
     string getWords();
     void addWord(string word);
+    bool hasWord(string word) const;;
 
     string getComment();
     void setComment(string comment);

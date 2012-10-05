@@ -56,11 +56,14 @@ private:
     void deallocClassMessages();
     void deallocHints();
     
+    void loadData(const string filename);
+    
 public:
-    Data();
+    Data(string filename = "advent.dat");
     virtual ~Data();
     
-    void loadData(const string filename);
+    // Could return any of the subclasses of Word as well
+    Word* findWord(string word) const;
     
     // For debugging purposes
     void dumpAllLocations();

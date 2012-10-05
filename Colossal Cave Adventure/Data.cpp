@@ -30,13 +30,15 @@
 // Hint
 #include "Hint.h"
 
-Data::Data() {
+Data::Data(string filename) {
     this->locations = new vector<Location*>();
     this->words = new vector<Word*>();
     this->messages = new vector<Message*>();
     this->magicMessages = new vector<MagicMessage*>();
     this->classMessages = new vector<ClassMessage*>();
     this->hints = new vector<Hint*>();
+    
+    this->loadData(filename);
 }
 
 Data::~Data() {
@@ -706,6 +708,17 @@ const string Data::reduce(const string& pString, const string& pFill, const stri
     return result;
 }*/
 
+Word* Data::findWord(string word) const {
+    // Find the word
+    for (int i = 0; i < this->words->size(); i++) {
+        if (this->words->at(i)->hasWord(word)) {
+            // Return a pointer to the word
+            return this->words->at(i);
+        }
+    }
+    // If no word was found, return NULL
+    return NULL;
+}
 
 void Data::dumpAllLocations() {
     for (int i = 0; i < this->locations->size(); i++) {
