@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "Player.h"
 #include "Data.h"
@@ -21,6 +22,8 @@ private:
     Player* player;
     
     Data* data;
+    
+    vector<Word*>* spokenWords;
     
     vector<string> &split(const string &s, char delim, vector<string> &elems);
     

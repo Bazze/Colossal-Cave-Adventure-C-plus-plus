@@ -8,9 +8,9 @@
 
 #include "Player.h"
 
-Player::Player() {
+Player::Player(Location* initialLocation) {
     this->score = 0;
-    this->currentLocation = NULL;
+    this->currentLocation = initialLocation;
     this->objects = new vector<Object*>();
 }
 Player::~Player() {

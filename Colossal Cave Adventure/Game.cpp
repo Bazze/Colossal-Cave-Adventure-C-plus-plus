@@ -11,14 +11,23 @@
 #include <vector>
 #include "Game.h"
 
+#include "MotionVerb.h"
+#include "Message.h"
+
 Game::Game() {
-    this->player = new Player();
-    
     // This will parse the data file
     this->data = new Data();
+    
+    Location* startingLocation = this->data->getLocationByNumber(1);
+    this->player = new Player(startingLocation);
+    
+    this->spokenWords = new vector<Word*>();
 }
 Game::~Game() {
     delete this->player;
+    delete this->spokenWords;
+    
+    // Important to delete this one last since a vector may not hold pointers to deleted objects
     delete this->data;
 }
 
@@ -38,7 +47,26 @@ void Game::parseInput(string input) {
     
     this->split(input, ' ', lineVector);
     
+    // Get the word object for every word written
+    Word* word = NULL;
     for (int i = 0; i < lineVector.size(); i++) {
-        this->data->findWord(lineVector.at(i));
+        if ( (word = this->data->findWord(lineVector.at(i))) != NULL) {
+            this->spokenWords->push_back(word);
+        }
     }
+    
+    
+    if (dynamic_cast<MotionVerb*>(this->spokenWords->at(0))) {
+        Message* msg = NULL;
+        Location* loc = NULL;
+        // Printing messages overrides going to a new location, therefore we check that first
+        if ( (msg = this->player->getCurrentLocation()->shouldPrintMessage((MotionVerb*)this->spokenWords->at(0))) != NULL) {
+            // Print out message to player
+        } else if ( (loc = this->player->getCurrentLocation()->shouldGoToLocation((MotionVerb*)this->spokenWords->at(0))) != NULL ) {
+            // Go to new location
+        }
+    }
+    
+    // Clear the vector for the next input
+    lineVector.clear();
 }

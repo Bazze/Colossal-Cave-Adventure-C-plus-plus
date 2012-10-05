@@ -56,6 +56,7 @@ int main(int argc, const char * argv[])
                 cerr << "ERROR: Unable to create thread" << endl;
                 exit(1);
             }
+            
         }
     } catch (SocketException &e) {
         cerr << e.what() << endl;

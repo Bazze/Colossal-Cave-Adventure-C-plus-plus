@@ -36,8 +36,6 @@ private:
     
     void init(int number = -1, string longDescription = "", string shortDescription = "");
     
-    
-    
     const int getAccessibleLocationIndex(Location* loc) const;
     const int getPrintMessageIndex(Message* msg) const;
     
@@ -70,9 +68,11 @@ public:
     
     void addAccessibleLocation(Location* loc);
     void addMotionVerb(Location* loc, MotionVerb* verb);
+    Location* shouldGoToLocation(MotionVerb* verb);
     
     void addPrintMessage(Message* msg);
     void addMotionVerbForPrintMessage(Message* msg, MotionVerb* verb);
+    Message* shouldPrintMessage(MotionVerb* verb);
     
     const string toString();
 };

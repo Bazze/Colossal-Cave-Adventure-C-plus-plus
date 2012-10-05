@@ -23,7 +23,7 @@ private:
     vector<Object*> *objects;
     
 public:
-    Player();
+    Player(Location* initialLocation);
     virtual ~Player();
 
     int getScore() const;

@@ -109,6 +109,17 @@ void Location::addMotionVerb(Location* loc, MotionVerb* verb) {
     int index = this->getAccessibleLocationIndex(loc);
     this->motionVerbs->at(index)->push_back(verb);
 }
+Location* Location::shouldGoToLocation(MotionVerb *verb) {
+    for (int i = 0; i < this->motionVerbs->size(); i++) {
+        for (int x = 0; x < this->motionVerbs->at(i)->size(); x++) {
+            // OK to compare pointers
+            if (this->motionVerbs->at(i)->at(x) == verb) {
+                return this->accessibleLocations->at(i);
+            }
+        }
+    }
+    return NULL;
+}
 
 void Location::addPrintMessage(Message* msg) {
     // Only add if not alread added
@@ -120,6 +131,17 @@ void Location::addPrintMessage(Message* msg) {
 void Location::addMotionVerbForPrintMessage(Message* msg, MotionVerb* verb) {
     int index = this->getPrintMessageIndex(msg);
     this->motionVerbsForPrintingMessage->at(index)->push_back(verb);
+}
+Message* Location::shouldPrintMessage(MotionVerb* verb) {
+    for (int i = 0; i < this->motionVerbsForPrintingMessage->size(); i++) {
+        for (int x = 0; x < this->motionVerbsForPrintingMessage->at(i)->size(); x++) {
+            // OK to compare pointers
+            if (this->motionVerbsForPrintingMessage->at(i)->at(x) == verb) {
+                return this->printMessages->at(i);
+            }
+        }
+    }
+    return NULL;
 }
 
 const string Location::listObjects() {
