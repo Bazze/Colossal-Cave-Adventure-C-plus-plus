@@ -47,7 +47,6 @@ Player* Game::getPlayer() const {
 }
 
 string Game::parseInput(string input) {
-    cout << "Input: " << input << endl;
     vector<string> lineVector;
     vector<Word*> spokenWords = vector<Word*>();
     
@@ -80,10 +79,8 @@ string Game::parseInput(string input) {
         }
         // Handle actions like "get keys", "get lamp"
         else if (dynamic_cast<ActionVerb*>(spokenWords.at(0)) && spokenWords.size() == 2) {
-            cout << "ActionVerb" << endl;
             ActionVerb* verb = (ActionVerb*)spokenWords.at(0);
             if (dynamic_cast<Object*>(spokenWords.at(1))) {
-                cout << "Object" << endl;
                 Object* obj = (Object*)spokenWords.at(1);
                 // Pick up object
                 if (verb->doesPickUpObject()) {
