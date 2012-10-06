@@ -97,6 +97,8 @@ string Game::parseInput(string input) {
                         // Leave the object at the current location
                         this->player->getCurrentLocation()->addObject(obj);
                         return "You dropped: " + obj->getInventoryMessage();
+                    } else {
+                        return "You don't have this object in your inventory.";
                     }
                 }
             } else {
