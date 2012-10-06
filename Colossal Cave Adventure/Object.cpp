@@ -15,6 +15,8 @@ Object::Object(int number, string word, string comment) : Word(number, word, com
     this->inventoryMessage = "";
     this->descriptions = new vector<string>();
     this->movable = true;
+    this->lightable = false;
+    this->lit = false;
 }
 
 Object::~Object() {
@@ -61,18 +63,32 @@ void Object::appendToPropertyDescription(const int n, const string desc) {
     }
 }
 
-const bool Object::isTreasure() {
+bool Object::isTreasure() const {
     return this->treasure;
 }
 void Object::setTreasure(const bool treasure) {
     this->treasure = treasure;
 }
 
-const bool Object::isMovable() {
+bool Object::isMovable() const {
     return this->movable;
 }
 void Object::setMovable(const bool movable) {
     this->movable = movable;
+}
+
+bool Object::isLightable() const {
+    return this->lightable;
+}
+void Object::setLightable(bool l) {
+    this->lightable = l;
+}
+
+bool Object::isLit() const {
+    return this->lit;
+}
+void Object::setLit(bool l) {
+    this->lit = l;
 }
 
 const string Object::toString() {

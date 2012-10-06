@@ -23,11 +23,13 @@ private:
     
     Data* data;
     
-    vector<string> &split(const string &s, char delim, vector<string> &elems);
+    vector<string> &split(const string &s, char delim, vector<string> &elems, int lengthPerWord = 5);
     
 public:
     Game();
     virtual ~Game();
+    
+    Player* getPlayer() const;
     
     string parseInput(string input);
 

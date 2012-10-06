@@ -25,6 +25,10 @@ private:
     bool treasure;
     bool movable;
     
+    // For Light object
+    bool lightable;
+    bool lit;
+    
 public:
     Object(int number, string word, string comment = "");
     ~Object();
@@ -41,11 +45,17 @@ public:
     void addPropertyDescription(const string desc);
     void appendToPropertyDescription(const int n, const string desc);
     
-    const bool isTreasure();
+    bool isTreasure() const;
     void setTreasure(const bool treasure);
     
-    const bool isMovable();
+    bool isMovable() const;
     void setMovable(const bool movable);
+    
+    bool isLightable() const;
+    void setLightable(bool l);
+    
+    bool isLit() const;
+    void setLit(bool l);
     
     const string toString();
 };

@@ -30,23 +30,28 @@ Game::~Game() {
     delete this->data;
 }
 
-/* Split function from: http://stackoverflow.com/questions/236129/splitting-a-string-in-c#answer-236803 */
-vector<string>& Game::split(const string &s, char delim, vector<string> &elems) {
+// Split function from: http://stackoverflow.com/questions/236129/splitting-a-string-in-c#answer-236803
+// Added: length per word
+vector<string>& Game::split(const string &s, char delim, vector<string> &elems, int lengthPerWord) {
     stringstream ss(s);
     string item;
     while(getline(ss, item, delim)) {
-        elems.push_back(item);
+        elems.push_back(item.substr(0, lengthPerWord));
     }
     return elems;
 }
 /* End split */
+
+Player* Game::getPlayer() const {
+    return this->player;
+}
 
 string Game::parseInput(string input) {
     cout << "Input: " << input << endl;
     vector<string> lineVector;
     vector<Word*> spokenWords = vector<Word*>();
     
-    this->split(input, ' ', lineVector);
+    this->split(input, ' ', lineVector, 5);
     
     // Get the word object for every word written
     Word* word = NULL;
@@ -70,7 +75,7 @@ string Game::parseInput(string input) {
             } else if ( (loc = this->player->getCurrentLocation()->shouldGoToLocation((MotionVerb*)spokenWords.at(0))) != NULL ) {
                 // Go to new location
                 this->player->setCurrentLocation(loc);
-                return loc->getShortDescription() + "\n" + loc->getLongDescription();
+                return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription();
             }
         }
         // Handle actions like "get keys", "get lamp"
@@ -80,6 +85,7 @@ string Game::parseInput(string input) {
             if (dynamic_cast<Object*>(spokenWords.at(1))) {
                 cout << "Object" << endl;
                 Object* obj = (Object*)spokenWords.at(1);
+                // Pick up object
                 if (verb->doesPickUpObject()) {
                     if (this->player->getCurrentLocation()->hasObject(obj)) {
                         // Pick up the object from the current location
@@ -90,7 +96,9 @@ string Game::parseInput(string input) {
                     } else {
                         return "There is no such object at this location.";
                     }
-                } else if (verb->doesDropObject()) {
+                }
+                // Drop object
+                else if (verb->doesDropObject()) {
                     if (this->player->hasObject(obj)) {
                         // Drop object
                         this->player->dropObject(obj);
@@ -101,11 +109,24 @@ string Game::parseInput(string input) {
                         return "You don't have this object in your inventory.";
                     }
                 }
+                // Light lamp
+                else if (verb->getNumber()%2000 == 7 && obj->isLightable()) {
+                    if (this->player->hasObject(obj)) {
+                        if (!obj->isLit()) {
+                            obj->setLit(true);
+                            return "You switched the brass lantern on.";
+                        } else {
+                            return "This lamp is already lit.";
+                        }
+                    } else {
+                        return "You do not have this object so you can't switch it on.";
+                    }
+                }
             } else {
                 return "No such object exist";
             }
         }
     }
     
-    return "Unknown words";
+    return "";
 }

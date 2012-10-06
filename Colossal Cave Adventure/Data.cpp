@@ -350,16 +350,22 @@ void Data::parseLines(ifstream &dataFile) {
                         // OBJECTS FROM 50 TO 79 ARE CONSIDERED TREASURES
                         if (idNumber%1000 >= 50 && idNumber%1000 <= 79) {
                             ((Object*)currentWord)->setTreasure(true);
+                        } else if (idNumber%1000 == 2) {
+                            ((Object*)currentWord)->setLightable(true);
                         }
                     } else if (M == 2) {
                         currentWord = new ActionVerb(idNumber, lineVector.at(1));
-                        // ActionVerb with id 1 picks up an object
-                        if (idNumber%2000 == 1) {
-                            ((ActionVerb*)currentWord)->setPicksUpObject(true);
-                        }
-                        // ActionVerb with id 2 drops an object
-                        else if (idNumber%2000 == 2) {
-                            ((ActionVerb*)currentWord)->setDropsObject(true);
+                        switch (idNumber%2000) {
+                            // ActionVerb with id 1 picks up an object
+                            case 1:
+                                ((ActionVerb*)currentWord)->setPicksUpObject(true);
+                            break;
+                                
+                            // ActionVerb with id 2 drops an object
+                            case 2:
+                                ((ActionVerb*)currentWord)->setDropsObject(true);
+                            break;
+                            
                         }
                     } else if (M == 3) {
                         currentWord = new SpecialCaseVerb(idNumber, lineVector.at(1));

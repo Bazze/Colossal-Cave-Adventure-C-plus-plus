@@ -73,7 +73,7 @@ bool exitMsg(char *buffer){
     }
     
     /* Check if the Quit string has been sent, and return the appropriate bool-value */
-    if(str == "Quit") {
+    if(str == "quit") {
         return true;
     } else {
         return false;
@@ -119,7 +119,10 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
         cout << sock->getForeignAddress() << ":" << sock->getForeignPort() << " says: " << str << endl;
         
         returnMsg = game->parseInput(str);
-        returnMsg += "\n";
+        if (returnMsg != "") {
+            returnMsg += "\n";
+        }
+        returnMsg += "> ";
         
         const char *returnBuffer = returnMsg.c_str();
         sock->send(returnBuffer, returnMsg.length()+1);
@@ -130,6 +133,10 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
 
 void *ThreadMain(void *clntSock) {
     Game* game = new Game();
+    
+    string str = "\n\n\n\n\n\n\n\n\n\n\n" + game->getPlayer()->getCurrentLocation()->getShortDescription() + (game->getPlayer()->getCurrentLocation()->getShortDescription() != "" ? "\n" : "") + game->getPlayer()->getCurrentLocation()->getLongDescription() + "\n> ";
+    const char *returnBuffer = str.c_str();
+    ((TCPSocket *)clntSock)->send(returnBuffer, str.length()+1);
     
     // Guarantees that thread resources are deallocated upon return
     pthread_detach(pthread_self());
