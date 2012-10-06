@@ -119,6 +119,19 @@ string Game::parseInput(string input) {
                         return "You do not have this object so you can't switch it on.";
                     }
                 }
+                // Turn off lamp
+                else if (verb->getNumber()%2000 == 8 && obj->isLightable()) {
+                    if (this->player->hasObject(obj)) {
+                        if (obj->isLit()) {
+                            obj->setLit(true);
+                            return "You switched the brass lantern off.";
+                        } else {
+                            return "This brass lantern is already off.";
+                        }
+                    } else {
+                        return "You do not have this object so you can't switch it off.";
+                    }
+                }
             } else {
                 return "No such object exist";
             }
