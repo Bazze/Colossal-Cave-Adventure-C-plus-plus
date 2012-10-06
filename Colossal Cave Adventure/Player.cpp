@@ -34,12 +34,23 @@ Location* Player::getCurrentLocation() const {
     return this->currentLocation;
 }
 
+void Player::pickUpObject(Object* obj) {
+    this->objects->push_back(obj);
+}
+void Player::dropObject(Object *obj) {
+    bool found = false;
+    for (int i = 0; i < this->objects->size() && !found; i++) {
+        // OK to compare pointers
+        if (this->objects->at(i) == obj) {
+            this->objects->erase(this->objects->begin()+i);
+            found = true;
+        }
+    }
+}
 bool Player::hasObject(Object *obj) const {
     bool found = false;
     for (int i = 0; i < this->objects->size() && !found; i++) {
-        // We are comparing the pointers and that's ok. Since
-        // we only create all objects once we're passing that
-        // object's pointer around everywhere
+        // OK to compare pointers
         if (this->objects->at(i) == obj) {
             found = true;
         }

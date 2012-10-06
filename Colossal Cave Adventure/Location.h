@@ -63,6 +63,8 @@ public:
     void appendToLongDescription(const string desc);
     
     void addObject(Object* obj);
+    bool hasObject(Object* obj) const;
+    void removeObject(Object* obj);
     
     void setAsset(const int index, const bool value = true);
     

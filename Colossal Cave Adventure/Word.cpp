@@ -6,6 +6,8 @@
 //  Copyright (c) 2012. All rights reserved.
 //
 
+#include <algorithm>
+#include <string>
 #include <sstream>
 
 #include "Word.h"
@@ -60,6 +62,7 @@ void Word::addWord(string word) {
 }
 bool Word::hasWord(string word) const {
     for (int i = 0; i < this->words->size(); i++) {
+        transform(word.begin(), word.end(), word.begin(), ::toupper);
         if (this->words->at(i) == word) {
             return true;
         }

@@ -87,6 +87,25 @@ void Location::appendToLongDescription(const string desc) {
 void Location::addObject(Object* obj) {
     this->objects->push_back(obj);
 }
+bool Location::hasObject(Object* obj) const {
+    for (int i = 0; i < this->objects->size(); i++) {
+        // OK to compare pointers
+        if (this->objects->at(i) == obj) {
+            return true;
+        }
+    }
+    return false;
+}
+void Location::removeObject(Object *obj) {
+    bool found = false;
+    for (int i = 0; i < this->objects->size() && !found; i++) {
+        // OK to compare pointers
+        if (this->objects->at(i) == obj) {
+            this->objects->erase(this->objects->begin()+i);
+            found = true;
+        }
+    }
+}
 
 void Location::setAsset(const int index, const bool value) {
     if (index >= 0 && index < 10) {

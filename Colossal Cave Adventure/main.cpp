@@ -15,7 +15,7 @@
 
 const int RECEIVEBUFFERSIZE = 128;
 
-void HandleTCPClient(TCPSocket *socket);
+void HandleTCPClient(TCPSocket *socket, Game* game);
 bool exitMsg(char *buffer);
 void *ThreadMain(void *arg);
 
@@ -25,11 +25,6 @@ int main(int argc, const char * argv[])
     
     // insert code here...
     std::cout << "Hello, World!\n";
-    
-    Game* game = new Game();
-    
-    delete game;
-    
     
     /* The Server Code */
     /* A big Thank You to Professor Michael J. Donahoo 
@@ -56,7 +51,6 @@ int main(int argc, const char * argv[])
                 cerr << "ERROR: Unable to create thread" << endl;
                 exit(1);
             }
-            
         }
     } catch (SocketException &e) {
         cerr << e.what() << endl;
@@ -88,7 +82,7 @@ bool exitMsg(char *buffer){
 
 
 // TCP client handling function
-void HandleTCPClient(TCPSocket *sock) {
+void HandleTCPClient(TCPSocket *sock, Game* game) {
     cout << "Handling client ";
     try {
         cout << sock->getForeignAddress() << ":";
@@ -103,9 +97,11 @@ void HandleTCPClient(TCPSocket *sock) {
     cout << " with thread " << pthread_self() << endl;
     
     // Send received string and receive again until the end of transmission
+    
+    string returnMsg = "";
     char clientBuffer[RECEIVEBUFFERSIZE];
 
-    while (1) { 
+    while (1) {
         /* Get the message from the socket */
         sock->recv(clientBuffer, RECEIVEBUFFERSIZE);
         
@@ -116,22 +112,31 @@ void HandleTCPClient(TCPSocket *sock) {
         
         /* Debugging that prints the string from the client */
         string str;
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < RECEIVEBUFFERSIZE/8; i++){
+            if (!::isprint(clientBuffer[i])) break;
             str+=clientBuffer[i];
         }
         cout << sock->getForeignAddress() << ":" << sock->getForeignPort() << " says: " << str << endl;
-
+        
+        returnMsg = game->parseInput(str);
+        returnMsg += "\n";
+        
+        const char *returnBuffer = returnMsg.c_str();
+        sock->send(returnBuffer, returnMsg.length()+1);
+        
     }
     /* Destructor closes socket */
 }
 
 void *ThreadMain(void *clntSock) {
+    Game* game = new Game();
+    
     // Guarantees that thread resources are deallocated upon return
     pthread_detach(pthread_self());
-    
     // Extract socket file descriptor from argument
-    HandleTCPClient((TCPSocket *) clntSock);
+    HandleTCPClient((TCPSocket *) clntSock, game);
     
+    delete game;
     delete (TCPSocket *) clntSock;
     return NULL;
 }

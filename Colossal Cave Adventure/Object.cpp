@@ -28,7 +28,7 @@ void Object::setPropertyValue(const int propertyValue) {
     this->propertyValue = propertyValue;
 }
 
-const string Object::getInventoryMessage() {
+const string Object::getInventoryMessage() const {
     return this->inventoryMessage;
 }
 void Object::setInventoryMessage(const string msg) {
@@ -39,13 +39,13 @@ void Object::setDescriptionsVector(vector<string> *vector) {
     delete this->descriptions;
     this->descriptions = vector;
 }
-const string Object::getDescriptionForPropertyValue(const int n) {
+const string Object::getDescriptionForPropertyValue(const int n) const {
     if (this->descriptions->size() >= n) {
         return this->descriptions->at(n);
     }
     return "";
 }
-const string Object::getPropertyDescriptions() {
+const string Object::getPropertyDescriptions() const {
     stringstream s;
     for (int i = 0; i < this->descriptions->size(); i++) {
         s << endl << "\t" << i << ": " << this->descriptions->at(i);

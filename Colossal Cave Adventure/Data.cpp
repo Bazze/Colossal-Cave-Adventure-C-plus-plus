@@ -103,7 +103,7 @@ void Data::loadData(const string filename) {
         dataFile.close();
     }
     //this->dumpAllLocations();
-    //this->dumpAllWords();
+    this->dumpAllWords();
     //this->dumpAllMessages();
     //this->dumpAllClassMessages();
     //this->dumpAllHints();
@@ -353,6 +353,14 @@ void Data::parseLines(ifstream &dataFile) {
                         }
                     } else if (M == 2) {
                         currentWord = new ActionVerb(idNumber, lineVector.at(1));
+                        // ActionVerb with id 1 picks up an object
+                        if (idNumber%2000 == 1) {
+                            ((ActionVerb*)currentWord)->setPicksUpObject(true);
+                        }
+                        // ActionVerb with id 2 drops an object
+                        else if (idNumber%2000 == 2) {
+                            ((ActionVerb*)currentWord)->setDropsObject(true);
+                        }
                     } else if (M == 3) {
                         currentWord = new SpecialCaseVerb(idNumber, lineVector.at(1));
                     }

@@ -33,6 +33,8 @@ public:
     void setCurrentLocation(Location* loc);
     Location* getCurrentLocation() const;
     
+    void pickUpObject(Object* obj);
+    void dropObject(Object* obj);
     bool hasObject(Object* obj) const;
     vector<Object*>* getObjects() const;
 

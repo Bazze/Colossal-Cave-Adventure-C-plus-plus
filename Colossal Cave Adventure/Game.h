@@ -23,15 +23,13 @@ private:
     
     Data* data;
     
-    vector<Word*>* spokenWords;
-    
     vector<string> &split(const string &s, char delim, vector<string> &elems);
     
 public:
     Game();
     virtual ~Game();
     
-    void parseInput(string input);
+    string parseInput(string input);
 
 };
 

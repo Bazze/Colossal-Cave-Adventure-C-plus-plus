@@ -32,12 +32,12 @@ public:
     const int getPropertyValue();
     void setPropertyValue(const int propertyValue);
     
-    const string getInventoryMessage();
+    const string getInventoryMessage() const;
     void setInventoryMessage(const string msg);
     
     void setDescriptionsVector(vector<string> *vector);
-    const string getDescriptionForPropertyValue(const int n);
-    const string getPropertyDescriptions();
+    const string getDescriptionForPropertyValue(const int n) const;
+    const string getPropertyDescriptions() const;
     void addPropertyDescription(const string desc);
     void appendToPropertyDescription(const int n, const string desc);
     
