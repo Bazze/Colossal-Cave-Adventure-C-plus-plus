@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "Player.h"
+#include "Location.h"
 #include "Data.h"
 
 class Game {
@@ -24,6 +25,8 @@ private:
     Data* data;
     
     vector<string> &split(const string &s, char delim, vector<string> &elems, int lengthPerWord = 5);
+    
+    string getHint(Location* loc) const;
     
 public:
     Game();

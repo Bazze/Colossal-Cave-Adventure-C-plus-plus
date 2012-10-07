@@ -28,6 +28,7 @@ Location::Location(int number, string longDescription, string shortDescription) 
 
 void Location::init(int number, string longDescription, string shortDescription) {
     this->number = number;
+    this->numberOfVisits = 0;
     this->longDescription = longDescription;
     this->shortDescription = shortDescription;
     this->objects = new vector<Object*>();
@@ -35,6 +36,7 @@ void Location::init(int number, string longDescription, string shortDescription)
     for (int i = 0; i < 10; i++) {
         this->assets.push_back(false);
     }
+    this->hints = new vector<Hint*>();
     this->motionVerbs = new vector<vector<MotionVerb*>*>();
     this->accessibleLocations = new vector<Location*>();
     this->motionVerbsForPrintingMessage = new vector<vector<MotionVerb*>*>();
@@ -55,6 +57,7 @@ Location::~Location() {
     delete this->printMessages;
     
     delete this->objects;
+    delete this->hints;
 }
 
 const int Location::getNumber() const {
@@ -62,6 +65,13 @@ const int Location::getNumber() const {
 }
 void Location::setNumber(const int number) {
     this->number = number;
+}
+
+int Location::getNumberOfVisits() const {
+    return this->numberOfVisits;
+}
+void Location::visit() {
+    this->numberOfVisits++;
 }
 
 const string Location::getShortDescription() {
@@ -107,6 +117,9 @@ void Location::removeObject(Object *obj) {
     }
 }
 
+bool Location::isAsset(int index) const {
+    return this->assets.at(index);
+}
 void Location::setAsset(const int index, const bool value) {
     if (index >= 0 && index < 10) {
         this->assets.at(index) = value;
@@ -114,6 +127,13 @@ void Location::setAsset(const int index, const bool value) {
         // For debugging
         cout << "ERROR: Location class: asset index out of bounds" << endl;
     }
+}
+
+void Location::addHint(Hint* h) {
+    this->hints->push_back(h);
+}
+vector<Hint*>* Location::getHints() const {
+    return this->hints;
 }
 
 // Returns the index of the newly added location
@@ -163,7 +183,7 @@ Message* Location::shouldPrintMessage(MotionVerb* verb) {
     return NULL;
 }
 
-const string Location::listObjects() {
+string Location::listObjects() const {
     stringstream s;
     if (this->objects->size() > 0) {
         for (int i = 0; i < this->objects->size(); i++) {
@@ -195,7 +215,7 @@ const int Location::getPrintMessageIndex(Message *msg) const {
     return -1;
 }
 
-const string Location::getAccessibleLocationsAndMotionVerbsAsString() {
+string Location::getAccessibleLocationsAndMotionVerbsAsString() const {
     stringstream ss;
     ss << "Accessible locations:" << endl;
     if (this->accessibleLocations->size() > 0) {
@@ -215,7 +235,7 @@ const string Location::getAccessibleLocationsAndMotionVerbsAsString() {
     }
     return ss.str();
 }
-const string Location::getPrintMessagesAndMotionVerbsAsString() {
+string Location::getPrintMessagesAndMotionVerbsAsString() const {
     stringstream ss;
     ss << "Print messages:" << endl;
     if (this->printMessages->size() > 0) {
@@ -235,7 +255,7 @@ const string Location::getPrintMessagesAndMotionVerbsAsString() {
     }
     return ss.str();
 }
-const string Location::getAssetsAsString() {
+string Location::getAssetsAsString() const {
     stringstream ss;
     ss << "Assets:" << endl;
     for (int i = 0; i < this->assets.size(); i++) {
@@ -243,9 +263,23 @@ const string Location::getAssetsAsString() {
     }
     return ss.str();
 }
+string Location::getHintsAsString() {
+    stringstream ss;
+    ss << "Hints:" << endl;
+    if (this->hints->size() > 0) {
+        for (int i = 0; i < this->hints->size(); i++) {
+            if (this->hints->at(i)->getHintObject() != NULL) {
+                ss << "\t" << this->hints->at(i)->getHintObject()->getNumber() << ": " << this->hints->at(i)->getHintObject()->getContent() << endl;
+            }
+        }
+    } else {
+        ss << "\t<none>" << endl;
+    }
+    return ss.str();
+}
 
-const string Location::toString() {
+string Location::toString() {
     stringstream s;
-    s << "Id: " << this->getNumber() << endl << "Short description:" << endl << (this->getShortDescription() == "" ? "<empty>" : this->getShortDescription()) << endl << "Long description:" << endl << this->getLongDescription() << endl << "Objects:" << endl << this->listObjects() << endl << this->getAccessibleLocationsAndMotionVerbsAsString() << this->getPrintMessagesAndMotionVerbsAsString() << this->getAssetsAsString();
+    s << "Id: " << this->getNumber() << endl << "Short description:" << endl << (this->getShortDescription() == "" ? "<empty>" : this->getShortDescription()) << endl << "Long description:" << endl << this->getLongDescription() << endl << "Objects:" << endl << this->listObjects() << endl << this->getHintsAsString() << this->getAccessibleLocationsAndMotionVerbsAsString() << this->getPrintMessagesAndMotionVerbsAsString() << this->getAssetsAsString();
     return s.str();
 }

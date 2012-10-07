@@ -103,7 +103,7 @@ void Data::loadData(const string filename) {
         dataFile.close();
     }
     //this->dumpAllLocations();
-    this->dumpAllWords();
+    //this->dumpAllWords();
     //this->dumpAllMessages();
     //this->dumpAllClassMessages();
     //this->dumpAllHints();
@@ -583,13 +583,21 @@ void Data::parseLines(ifstream &dataFile) {
                     cout << "ERROR: Section 11.1: Could not find question or hint message." << endl;
                 }
 
-                this->hints->push_back(new Hint(
-                    atoi(lineVector.at(0).c_str()),
+                int assetIndex = atoi(lineVector.at(0).c_str());
+                Hint* currentHint = new Hint(
+                    assetIndex,
                     atoi(lineVector.at(1).c_str()),
                     atoi(lineVector.at(2).c_str()),
                     question,
                     hint
-                ));
+                );
+                this->hints->push_back(currentHint);
+                
+                for (int i = 0; i < this->locations->size(); i++) {
+                    if (this->locations->at(i)->isAsset(assetIndex)) {
+                        this->locations->at(i)->addHint(currentHint);
+                    }
+                }
             }
             break;
 

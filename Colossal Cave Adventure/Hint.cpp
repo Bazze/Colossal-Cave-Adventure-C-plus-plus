@@ -14,6 +14,7 @@ Hint::Hint(int conditionBit, int numberOfTurns, int pointsToDeduct, Message* que
     this->conditionBit = conditionBit;
     this->numberOfTurns = numberOfTurns;
     this->pointsToDeduct = pointsToDeduct;
+    this->read = false;
     this->question = question;
     this->hint = hint;
 }
@@ -22,16 +23,20 @@ Hint::~Hint() {
     
 }
 
-const int Hint::getConditionBit() {
+int Hint::getConditionBit() const {
     return this->conditionBit;
 }
 
-const int Hint::getNumberOfTurns() {
+int Hint::getNumberOfTurns() const {
     return this->numberOfTurns;
 }
 
-const int Hint::getPointsToDeduct() {
+int Hint::getPointsToDeduct() const {
     return this->pointsToDeduct;
+}
+
+bool Hint::hasBeenRead() const {
+    return this->read;
 }
 
 const string Hint::getQuestion(bool emptyIfNull) {

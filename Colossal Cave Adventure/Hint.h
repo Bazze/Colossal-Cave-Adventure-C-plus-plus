@@ -19,6 +19,7 @@ private:
     int conditionBit;
     int numberOfTurns;
     int pointsToDeduct;
+    bool read;
     
     Message* question;
     Message* hint;
@@ -35,11 +36,13 @@ public:
     Hint(int conditionBit, int numberOfTurns, int pointsToDeduct, Message* question, Message* hint);
     virtual ~Hint();
 
-    const int getConditionBit();
+    int getConditionBit() const;
     
-    const int getNumberOfTurns();
+    int getNumberOfTurns() const;
     
-    const int getPointsToDeduct();
+    int getPointsToDeduct() const;
+    
+    bool hasBeenRead() const;
     
     const string getQuestion(bool emptyIfNull = true);
     Message* getQuestionObject();

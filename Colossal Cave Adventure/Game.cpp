@@ -15,6 +15,7 @@
 #include "ActionVerb.h"
 #include "Message.h"
 #include "Object.h"
+#include "Hint.h"
 
 Game::Game() {
     // This will parse the data file
@@ -46,6 +47,16 @@ Player* Game::getPlayer() const {
     return this->player;
 }
 
+string Game::getHint(Location* loc) const {
+    vector<Hint*>* hints = loc->getHints();
+    for (int i = 0; i < hints->size(); i++) {
+        if (loc->getNumberOfVisits() >= hints->at(i)->getNumberOfTurns()) {
+            return "\n-- HINT --\n " + hints->at(i)->getQuestion() + "\n" + hints->at(i)->getHint() + "\n";
+        }
+    }
+    return "";
+}
+
 string Game::parseInput(string input) {
     vector<string> lineVector;
     vector<Word*> spokenWords = vector<Word*>();
@@ -74,7 +85,8 @@ string Game::parseInput(string input) {
             } else if ( (loc = this->player->getCurrentLocation()->shouldGoToLocation((MotionVerb*)spokenWords.at(0))) != NULL ) {
                 // Go to new location
                 this->player->setCurrentLocation(loc);
-                return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription();
+                loc->visit();
+                return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription() + this->getHint(loc);
             }
         }
         // Handle actions like "get keys", "get lamp"

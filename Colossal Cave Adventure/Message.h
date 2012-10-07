@@ -25,7 +25,7 @@ public:
     Message(const int number);
     virtual ~Message();
     
-    const int getNumber();
+    int getNumber() const;
     void setNumber(const int number);
     
     const string getContent();

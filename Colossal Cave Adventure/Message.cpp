@@ -22,7 +22,7 @@ Message::~Message() {
     
 }
 
-const int Message::getNumber() {
+int Message::getNumber() const {
     return this->number;
 }
 void Message::setNumber(const int number) {
