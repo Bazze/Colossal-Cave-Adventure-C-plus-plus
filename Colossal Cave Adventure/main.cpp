@@ -9,6 +9,8 @@
 #include <iostream>
 #include <pthread.h>
 #include <cstdlib>
+#include <stdio.h>
+#include <syslog.h>
 #include "Game.h"
 #include "PracticalSocket.h"
 
@@ -51,6 +53,7 @@ int main(int argc, const char * argv[])
                 cerr << "ERROR: Unable to create thread" << endl;
                 exit(1);
             }
+            
         }
     } catch (SocketException &e) {
         cerr << e.what() << endl;
@@ -132,6 +135,8 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
 }
 
 void *ThreadMain(void *clntSock) {
+    syslog(LOG_INFO, "A player joined the game.");
+    
     Game* game = new Game();
     
     string str = "\n\n\n\n\n\n\n\n\n\n\n" + game->getPlayer()->getCurrentLocation()->getShortDescription() + (game->getPlayer()->getCurrentLocation()->getShortDescription() != "" ? "\n" : "") + game->getPlayer()->getCurrentLocation()->getLongDescription() + "\n> ";
@@ -142,6 +147,8 @@ void *ThreadMain(void *clntSock) {
     pthread_detach(pthread_self());
     // Extract socket file descriptor from argument
     HandleTCPClient((TCPSocket *) clntSock, game);
+    
+    syslog(LOG_INFO, "A player left the game.");
     
     delete game;
     delete (TCPSocket *) clntSock;
