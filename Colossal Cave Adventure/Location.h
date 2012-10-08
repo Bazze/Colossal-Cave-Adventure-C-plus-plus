@@ -76,6 +76,7 @@ public:
     void addObject(Object* obj);
     bool hasObject(Object* obj) const;
     void removeObject(Object* obj);
+    vector<Object*>* getObjects() const;
     
     bool isAsset(int index) const;
     void setAsset(const int index, const bool value = true);

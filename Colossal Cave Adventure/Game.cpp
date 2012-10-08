@@ -54,7 +54,7 @@ string Game::getHint(Location* loc) const {
     for (int i = 0; i < hints->size(); i++) {
         if (!hints->at(i)->hasBeenRead() && loc->getNumberOfVisits() >= hints->at(i)->getNumberOfTurns()) {
             hints->at(i)->setRead(true);
-            return "\n-- HINT --\n " + hints->at(i)->getQuestion() + "\n" + hints->at(i)->getHint() + "\n";
+            return "\n\n-- HINT --\n " + hints->at(i)->getQuestion() + "\n" + hints->at(i)->getHint();
         }
     }
     return "";
@@ -83,103 +83,126 @@ string Game::parseInput(string input) {
                 MotionVerb* verb = (MotionVerb*)spokenWords.at(0);
                 Message* msg = NULL;
                 Location* loc = NULL;
-                // Printing messages overrides going to a new location, therefore we check that first
-                if ( (msg = this->player->getCurrentLocation()->shouldPrintMessage(verb)) != NULL) {
-                    // Print out message to player
-                    return msg->getContent();
-                } else if ( (loc = this->player->getCurrentLocation()->shouldGoToLocation(verb)) != NULL ) {
-                    bool allowed = false;
-                    string msg = "";
-                    
-                    // Let see if all conditions are met
-                    LocationCondition* cond = this->player->getCurrentLocation()->getLocationConditionForLocation(loc);
-                    if (cond != NULL) {
-                        int M = cond->getCondition();
-                        
-                        // IF M=0		IT'S UNCONDITIONAL.
-                        if (M == 0) {
-                            allowed = true;
+                switch (verb->getNumber()) {
+                    // 57   LOOK EXAMI TOUCH DESCR
+                    case 57:
+                    {
+                        loc = this->player->getCurrentLocation();
+                        vector<Object*> *objects = loc->getObjects();
+                        string message = "";
+                        for (int i = 0; i < objects->size(); i++) {
+                            message += (i != 0 ? "\n\n" : "") + objects->at(i)->getCurrentPropertyDescription();
                         }
-                        // IF 0<M<100	IT IS DONE WITH M% PROBABILITY.
-                        else if (M > 0 && M < 100) {
-                            srand((unsigned)time(0));
-                            int randInt = (rand()%100)+1;
-                            if (randInt <= M) {
+                        
+                        if (message == "") {
+                            message = "You see nothing out of the ordinary.";
+                        }
+                        
+                        return message;
+                    }
+                    break;
+                        
+                    default:
+                    {
+                        // Printing messages overrides going to a new location, therefore we check that first
+                        if ( (msg = this->player->getCurrentLocation()->shouldPrintMessage(verb)) != NULL) {
+                            // Print out message to player
+                            return msg->getContent();
+                        } else if ( (loc = this->player->getCurrentLocation()->shouldGoToLocation(verb)) != NULL ) {
+                            bool allowed = false;
+                            string msg = "";
+                            
+                            // Let see if all conditions are met
+                            LocationCondition* cond = this->player->getCurrentLocation()->getLocationConditionForLocation(loc);
+                            if (cond != NULL) {
+                                int M = cond->getCondition();
+                                
+                                // IF M=0		IT'S UNCONDITIONAL.
+                                if (M == 0) {
+                                    allowed = true;
+                                }
+                                // IF 0<M<100	IT IS DONE WITH M% PROBABILITY.
+                                else if (M > 0 && M < 100) {
+                                    srand((unsigned)time(0));
+                                    int randInt = (rand()%100)+1;
+                                    if (randInt <= M) {
+                                        allowed = true;
+                                    }
+                                }
+                                // IF M=100	UNCONDITIONAL, BUT FORBIDDEN TO DWARVES.
+                                else if (M == 100) {
+                                    // Dwarves?
+                                    allowed = true;
+                                }
+                                // IF 100<M<=200	HE MUST BE CARRYING OBJECT M-100.
+                                else if (M > 100 && M <= 200) {
+                                    Object* obj = this->data->getObjectByNumber(M-100);
+                                    if (obj != NULL) {
+                                        if (this->player->hasObject(obj)) {
+                                            allowed = true;
+                                        } else {
+                                            msg = "You must be carrying " + obj->getInventoryMessage();
+                                        }
+                                    }
+                                }
+                                // IF 200<M<=300	MUST BE CARRYING OR IN SAME ROOM AS M-200.
+                                else if (M > 200 && M <= 300) {
+                                    Object* obj = this->data->getObjectByNumber(M-200);
+                                    if (obj != NULL) {
+                                        if (this->player->hasObject(obj) || this->player->getCurrentLocation()->hasObject(obj)) {
+                                            allowed = true;
+                                        } else {
+                                            msg = "You must be carrying or be in the same room as " + obj->getInventoryMessage();
+                                        }
+                                    }
+                                }
+                                // IF 300<M<=400	PROP(M MOD 100) MUST *NOT* BE 0.
+                                else if (M > 300 && M <= 400) {
+                                    Object* obj = this->data->getObjectByNumber(M%100);
+                                    if (obj != NULL) {
+                                        if (obj->getPropertyValue() != 0) {
+                                            allowed = true;
+                                        } else {
+                                            msg = "Property value must not be 0.";
+                                        }
+                                    }
+                                }
+                                // IF 400<M<=500	PROP(M MOD 100) MUST *NOT* BE 1.
+                                else if (M > 400 && M <= 500) {
+                                    Object* obj = this->data->getObjectByNumber(M%100);
+                                    if (obj != NULL) {
+                                        if (obj->getPropertyValue() != 1) {
+                                            allowed = true;
+                                        } else {
+                                            msg = "Property value must not be 1.";
+                                        }
+                                    }
+                                }
+                                // IF 500<M<=600	PROP(M MOD 100) MUST *NOT* BE 2, ETC.
+                                else if (M > 500 && M <= 600) {
+                                    Object* obj = this->data->getObjectByNumber(M%100);
+                                    if (obj != NULL) {
+                                        if (obj->getPropertyValue() != 2) {
+                                            allowed = true;
+                                        } else {
+                                            msg = "Property value must not be 2.";
+                                        }
+                                    }
+                                }
+                            } else {
                                 allowed = true;
                             }
-                        }
-                        // IF M=100	UNCONDITIONAL, BUT FORBIDDEN TO DWARVES.
-                        else if (M == 100) {
-                            // Dwarves?
-                            allowed = true;
-                        }
-                        // IF 100<M<=200	HE MUST BE CARRYING OBJECT M-100.
-                        else if (M > 100 && M <= 200) {
-                            Object* obj = this->data->getObjectByNumber(M-100);
-                            if (obj != NULL) {
-                                if (this->player->hasObject(obj)) {
-                                    allowed = true;
-                                } else {
-                                    msg = "You must be carrying " + obj->getInventoryMessage();
-                                }
+                            
+                            if (allowed) {
+                                // Go to new location
+                                this->player->setCurrentLocation(loc);
+                                return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription() + this->getHint(loc);
+                            } else {
+                                return msg;
                             }
                         }
-                        // IF 200<M<=300	MUST BE CARRYING OR IN SAME ROOM AS M-200.
-                        else if (M > 200 && M <= 300) {
-                            Object* obj = this->data->getObjectByNumber(M-200);
-                            if (obj != NULL) {
-                                if (this->player->hasObject(obj) || this->player->getCurrentLocation()->hasObject(obj)) {
-                                    allowed = true;
-                                } else {
-                                    msg = "You must be carrying or be in the same room as " + obj->getInventoryMessage();
-                                }
-                            }
-                        }
-                        // IF 300<M<=400	PROP(M MOD 100) MUST *NOT* BE 0.
-                        else if (M > 300 && M <= 400) {
-                            Object* obj = this->data->getObjectByNumber(M%100);
-                            if (obj != NULL) {
-                                if (obj->getPropertyValue() != 0) {
-                                    allowed = true;
-                                } else {
-                                    msg = "Property value must not be 0.";
-                                }
-                            }
-                        }
-                        // IF 400<M<=500	PROP(M MOD 100) MUST *NOT* BE 1.
-                        else if (M > 400 && M <= 500) {
-                            Object* obj = this->data->getObjectByNumber(M%100);
-                            if (obj != NULL) {
-                                if (obj->getPropertyValue() != 1) {
-                                    allowed = true;
-                                } else {
-                                    msg = "Property value must not be 1.";
-                                }
-                            }
-                        }
-                        // IF 500<M<=600	PROP(M MOD 100) MUST *NOT* BE 2, ETC.
-                        else if (M > 500 && M <= 600) {
-                            Object* obj = this->data->getObjectByNumber(M%100);
-                            if (obj != NULL) {
-                                if (obj->getPropertyValue() != 2) {
-                                    allowed = true;
-                                } else {
-                                    msg = "Property value must not be 2.";
-                                }
-                            }
-                        }
-                        
-                    } else {
-                        allowed = true;
                     }
-                    
-                    if (allowed) {
-                        // Go to new location
-                        this->player->setCurrentLocation(loc);
-                        return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription() + this->getHint(loc);
-                    } else {
-                        return msg;
-                    }
+                    break;
                 }
             }
         }
@@ -307,11 +330,30 @@ string Game::parseInput(string input) {
                             
                         // 2014 EAT DEVOU
                         case 2014:
-                            break;
+                            if (this->player->hasObject(obj)) {
+                                if (obj->getNumber() == 1014 /* CLAM */ ||
+                                    obj->getNumber() == 1015 /* OYSTER */ ||
+                                    obj->getNumber() == 1019 /* FOOD */) {
+                                    this->player->removeObject(obj);
+                                    return "You just ate: " + obj->getInventoryMessage();
+                                } else {
+                                    return "You cannot eat this.";
+                                }
+                            }
+                        break;
                             
                         // 2015 DRINK
                         case 2015:
-                            break;
+                            if (this->player->hasObject(obj)) {
+                                // WATER
+                                if (obj->getNumber() == 1021 && obj->getPropertyValue() == 0) {
+                                    obj->setPropertyValue(1); // 100	THERE IS AN EMPTY BOTTLE HERE.
+                                    return "You just drank: " + obj->getInventoryMessage();
+                                } else {
+                                    return "You cannot drink this.";
+                                }
+                            }
+                        break;
                             
                         // 2016 RUB
                         case 2016:

@@ -60,6 +60,15 @@ bool Player::hasObject(Object *obj) const {
     }
     return found;
 }
+void Player::removeObject(Object *obj) {
+    bool deleted = false;
+    for (int i = 0; i < this->objects->size() && !deleted; i++) {
+        if (this->objects->at(i) == obj) {
+            this->objects->erase(this->objects->begin() + i);
+            deleted = true;
+        }
+    }
+}
 vector<Object*>* Player::getObjects() const {
     return this->objects;
 }

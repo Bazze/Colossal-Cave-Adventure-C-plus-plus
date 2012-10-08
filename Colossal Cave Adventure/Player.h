@@ -36,6 +36,7 @@ public:
     void pickUpObject(Object* obj);
     void dropObject(Object* obj);
     bool hasObject(Object* obj) const;
+    void removeObject(Object* obj);
     vector<Object*>* getObjects() const;
 
     const string toString();

@@ -40,8 +40,9 @@ public:
     void setInventoryMessage(const string msg);
     
     void setDescriptionsVector(vector<string> *vector);
-    const string getDescriptionForPropertyValue(const int n) const;
-    const string getPropertyDescriptions() const;
+    string getDescriptionForPropertyValue(const int n) const;
+    string getPropertyDescriptions() const;
+    string getCurrentPropertyDescription();
     void addPropertyDescription(const string desc);
     void appendToPropertyDescription(const int n, const string desc);
     

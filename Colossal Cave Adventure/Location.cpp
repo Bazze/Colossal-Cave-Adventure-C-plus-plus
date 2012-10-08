@@ -118,6 +118,9 @@ void Location::removeObject(Object *obj) {
         }
     }
 }
+vector<Object*>* Location::getObjects() const {
+    return this->objects;
+}
 
 bool Location::isAsset(int index) const {
     return this->assets.at(index);
