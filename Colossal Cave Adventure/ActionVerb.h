@@ -19,8 +19,6 @@ class ActionVerb : public Word {
     
 private:
     Message* defaultMessage;
-    bool dropsObject;
-    bool picksUpObject;
     
 public:
     ActionVerb(int number, string word, string comment = "");
@@ -29,11 +27,6 @@ public:
     void setDefaultMessage(Message* msg);
     const string getDefaultMessage();
     Message* getDefaultMessageObject();
-    
-    bool doesDropObject() const;
-    bool doesPickUpObject() const;
-    void setDropsObject(bool drop);
-    void setPicksUpObject(bool pickUp);
     
     const string toString();
 };

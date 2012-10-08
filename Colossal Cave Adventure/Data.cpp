@@ -26,12 +26,17 @@
 // Messages
 #include "Message.h"
 #include "ClassMessage.h"
+#include "MagicMessage.h"
 
 // Hint
 #include "Hint.h"
 
+// LocationCondition
+#include "LocationCondition.h"
+
 Data::Data(string filename) {
     this->locations = new vector<Location*>();
+    this->locationConditions = new vector<LocationCondition*>();
     this->words = new vector<Word*>();
     this->messages = new vector<Message*>();
     this->magicMessages = new vector<MagicMessage*>();
@@ -43,6 +48,7 @@ Data::Data(string filename) {
 
 Data::~Data() {
     this->deallocLocations();
+    this->deallocLocationConditions();
     this->deallocWords();
     this->deallocMessages();
     this->deallocMagicMessages();
@@ -55,6 +61,12 @@ void Data::deallocLocations() {
         delete this->locations->at(i);
     }
     delete this->locations;
+}
+void Data::deallocLocationConditions() {
+    for (int i = 0; i < this->locationConditions->size(); i++) {
+        delete this->locationConditions->at(i);
+    }
+    delete this->locationConditions;
 }
 void Data::deallocWords() {
     for (int i = 0; i < this->words->size(); i++) {
@@ -101,6 +113,11 @@ void Data::loadData(const string filename) {
 
         // Close file stream
         dataFile.close();
+    }
+    for (int i = 0; i < this->words->size(); i++) {
+        if (dynamic_cast<ActionVerb*>(this->words->at(i))) {
+            cout << this->words->at(i)->getNumber() << " " << this->words->at(i)->getWords() << endl;
+        }
     }
     //this->dumpAllLocations();
     //this->dumpAllWords();
@@ -248,7 +265,8 @@ void Data::parseLines(ifstream &dataFile) {
             case 3:
             {
                 bool newLoc = false;
-                int N = atoi(lineVector.at(1).c_str())%1000;
+                int Y = atoi(lineVector.at(1).c_str());
+                int N = Y%1000;
                 
                 if (currentLocation == NULL || idNumber != currentLocation->getNumber()) {
                     newLoc = true;
@@ -272,6 +290,9 @@ void Data::parseLines(ifstream &dataFile) {
                         
                         // Add the accessible Location
                         currentLocation->addAccessibleLocation(accessibleLocation);
+                        
+                        // Add the condition for going to this location
+                        this->locationConditions->push_back(new LocationCondition(Y/1000, currentLocation, accessibleLocation));
                         
                         // Add the possible MotionVerbs which can be used to go to this location
                         int verbNr = -1;
@@ -355,18 +376,6 @@ void Data::parseLines(ifstream &dataFile) {
                         }
                     } else if (M == 2) {
                         currentWord = new ActionVerb(idNumber, lineVector.at(1));
-                        switch (idNumber%2000) {
-                            // ActionVerb with id 1 picks up an object
-                            case 1:
-                                ((ActionVerb*)currentWord)->setPicksUpObject(true);
-                            break;
-                                
-                            // ActionVerb with id 2 drops an object
-                            case 2:
-                                ((ActionVerb*)currentWord)->setDropsObject(true);
-                            break;
-                            
-                        }
                     } else if (M == 3) {
                         currentWord = new SpecialCaseVerb(idNumber, lineVector.at(1));
                     }
@@ -683,6 +692,10 @@ Message* Data::getMessageByNumber(const int n) {
         }
     }
     return NULL;
+}
+
+LocationCondition* Data::getLocationCondition(Location* from, Location* to) {
+    
 }
 
 /* Split function from: http://stackoverflow.com/questions/236129/splitting-a-string-in-c#answer-236803 */

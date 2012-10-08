@@ -14,15 +14,26 @@
 #include <vector>
 #include <fstream>
 
+// Location
 #include "Location.h"
+
+// Words
 #include "Word.h"
+#include "MotionVerb.h"
 #include "Object.h"
+#include "ActionVerb.h"
+#include "SpecialCaseVerb.h"
+
+// Messages
 #include "Message.h"
 #include "ClassMessage.h"
 #include "MagicMessage.h"
-#include "ActionVerb.h"
-#include "MotionVerb.h"
+
+// Hint
 #include "Hint.h"
+
+// LocationCondition
+#include "LocationCondition.h"
 
 
 using namespace std;
@@ -31,6 +42,7 @@ class Data {
   
 private:
     vector<Location*> *locations;
+    vector<LocationCondition*> *locationConditions;
     vector<Word*> *words;
     vector<Message*> *messages;
     vector<MagicMessage*> *magicMessages;
@@ -45,6 +57,7 @@ private:
     void parseLines(ifstream &dataFile);
     
     void deallocLocations();
+    void deallocLocationConditions();
     void deallocWords();
     void deallocMessages();
     void deallocMagicMessages();
@@ -65,6 +78,8 @@ public:
     ActionVerb* getActionVerbByNumber(const int n);
     MotionVerb* getMotionVerbByNumber(const int n);
     Message* getMessageByNumber(const int n);
+    
+    LocationCondition* getLocationCondition(Location* from, Location* to);
     
     // For debugging purposes
     void dumpAllLocations();

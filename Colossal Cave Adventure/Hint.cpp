@@ -38,6 +38,9 @@ int Hint::getPointsToDeduct() const {
 bool Hint::hasBeenRead() const {
     return this->read;
 }
+void Hint::setRead(bool read) {
+    this->read = read;
+}
 
 const string Hint::getQuestion(bool emptyIfNull) {
     if (this->question != NULL) {

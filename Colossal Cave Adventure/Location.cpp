@@ -41,6 +41,7 @@ void Location::init(int number, string longDescription, string shortDescription)
     this->accessibleLocations = new vector<Location*>();
     this->motionVerbsForPrintingMessage = new vector<vector<MotionVerb*>*>();
     this->printMessages = new vector<Message*>();
+    this->locationConditions = new vector<LocationCondition*>();
 }
 
 Location::~Location() {
@@ -58,6 +59,7 @@ Location::~Location() {
     
     delete this->objects;
     delete this->hints;
+    delete this->locationConditions;
 }
 
 const int Location::getNumber() const {
@@ -178,6 +180,19 @@ Message* Location::shouldPrintMessage(MotionVerb* verb) {
             if (this->motionVerbsForPrintingMessage->at(i)->at(x) == verb) {
                 return this->printMessages->at(i);
             }
+        }
+    }
+    return NULL;
+}
+
+void Location::addLocationCondition(LocationCondition *locC) {
+    
+}
+LocationCondition* Location::getLocationConditionForLocation(Location *loc) const {
+    for (int i = 0; i < this->locationConditions->size(); i++) {
+        // OK to compare pointers
+        if (this->locationConditions->at(i)->getToLocation() == loc) {
+            return this->locationConditions->at(i);
         }
     }
     return NULL;

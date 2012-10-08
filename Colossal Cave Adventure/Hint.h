@@ -43,6 +43,7 @@ public:
     int getPointsToDeduct() const;
     
     bool hasBeenRead() const;
+    void setRead(bool read);
     
     const string getQuestion(bool emptyIfNull = true);
     Message* getQuestionObject();

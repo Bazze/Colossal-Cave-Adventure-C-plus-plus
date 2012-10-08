@@ -16,6 +16,7 @@
 #include "Object.h"
 #include "Message.h"
 #include "Hint.h"
+#include "LocationCondition.h"
 
 using namespace std;
 
@@ -37,6 +38,8 @@ private:
     
     vector<Message*> *printMessages;
     vector<vector<MotionVerb*>*> *motionVerbsForPrintingMessage;
+    
+    vector<LocationCondition*> *locationConditions;
     
     void init(int number = -1, string longDescription = "", string shortDescription = "");
     
@@ -87,6 +90,9 @@ public:
     void addPrintMessage(Message* msg);
     void addMotionVerbForPrintMessage(Message* msg, MotionVerb* verb);
     Message* shouldPrintMessage(MotionVerb* verb);
+    
+    void addLocationCondition(LocationCondition* locC);
+    LocationCondition* getLocationConditionForLocation(Location* loc) const;
     
     string toString();
 };
