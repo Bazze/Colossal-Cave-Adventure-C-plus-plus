@@ -85,7 +85,6 @@ string Game::parseInput(string input) {
             } else if ( (loc = this->player->getCurrentLocation()->shouldGoToLocation((MotionVerb*)spokenWords.at(0))) != NULL ) {
                 // Go to new location
                 this->player->setCurrentLocation(loc);
-                loc->visit();
                 return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription() + this->getHint(loc);
             }
         }

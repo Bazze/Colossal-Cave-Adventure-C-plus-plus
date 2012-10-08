@@ -29,6 +29,9 @@ void Player::setScore(int s) {
 
 void Player::setCurrentLocation(Location *loc) {
     this->currentLocation = loc;
+    
+    // Increase the numberOfVisits of the location
+    loc->visit();
 }
 Location* Player::getCurrentLocation() const {
     return this->currentLocation;
