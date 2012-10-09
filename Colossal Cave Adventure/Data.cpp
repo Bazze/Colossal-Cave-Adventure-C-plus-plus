@@ -114,11 +114,6 @@ void Data::loadData(const string filename) {
         // Close file stream
         dataFile.close();
     }
-    for (int i = 0; i < this->words->size(); i++) {
-        if (dynamic_cast<ActionVerb*>(this->words->at(i))) {
-            cout << this->words->at(i)->getNumber() << " " << this->words->at(i)->getWords() << endl;
-        }
-    }
     //this->dumpAllLocations();
     //this->dumpAllWords();
     //this->dumpAllMessages();

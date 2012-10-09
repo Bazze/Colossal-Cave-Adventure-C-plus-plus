@@ -204,6 +204,9 @@ string Game::parseInput(string input) {
                     }
                     break;
                 }
+            } else if (dynamic_cast<ActionVerb*>(spokenWords.at(0))) {
+                ActionVerb* verb = (ActionVerb*)spokenWords.at(0);
+                return verb->getDefaultMessage();
             }
         }
         else if (spokenWords.size() == 2) {
@@ -280,7 +283,38 @@ string Game::parseInput(string input) {
                             
                         // 2004 UNLOC OPEN
                         case 2004:
-                            
+                            if (obj->getNumber() == 1014 /* CLAM */) {
+                                // 1018	KNIFE KNIVE
+                                if (this->player->hasObject(this->data->getObjectByNumber(18))) {
+                                    if (this->player->getCurrentLocation()->hasObject(obj)) {
+                                        // 124	A GLISTENING PEARL FALLS OUT OF THE CLAM AND ROLLS AWAY.  GOODNESS,
+                                        // 124	THIS MUST REALLY BE AN OYSTER.	(I NEVER WAS VERY GOOD AT IDENTIFYING
+                                        // 124	BIVALVES.)  WHATEVER IT IS, IT HAS NOW SNAPPED SHUT AGAIN.
+                                        return this->data->getMessageByNumber(124)->getContent();
+                                    } else if (this->player->hasObject(obj)) {
+                                        // 120	I ADVISE YOU TO PUT DOWN THE CLAM BEFORE OPENING IT.  >STRAIN!<
+                                        return this->data->getMessageByNumber(120)->getContent();
+                                    }
+                                } else {
+                                    // 122	YOU DON'T HAVE ANYTHING STRONG ENOUGH TO OPEN THE CLAM.
+                                    return this->data->getMessageByNumber(122)->getContent();
+                                }
+                            } else if (obj->getNumber() == 1015 /* OYSTER */) {
+                                // 1018	KNIFE KNIVE
+                                if (this->player->hasObject(this->data->getObjectByNumber(18))) {
+                                    if (this->player->getCurrentLocation()->hasObject(obj)) {
+                                        // 125	THE OYSTER CREAKS OPEN, REVEALING NOTHING BUT OYSTER INSIDE.  IT
+                                        // 125	PROMPTLY SNAPS SHUT AGAIN.
+                                        return this->data->getMessageByNumber(125)->getContent();
+                                    } else if (this->player->hasObject(obj)) {
+                                        // 121	I ADVISE YOU TO PUT DOWN THE OYSTER BEFORE OPENING IT.	>WRENCH!<
+                                        return this->data->getMessageByNumber(121)->getContent();
+                                    }
+                                } else {
+                                    // 123	YOU DON'T HAVE ANYTHING STRONG ENOUGH TO OPEN THE OYSTER.
+                                    return this->data->getMessageByNumber(123)->getContent();
+                                }
+                            }
                         break;
                             
                         // 2006 LOCK CLOSE
@@ -331,9 +365,7 @@ string Game::parseInput(string input) {
                         // 2014 EAT DEVOU
                         case 2014:
                             if (this->player->hasObject(obj)) {
-                                if (obj->getNumber() == 1014 /* CLAM */ ||
-                                    obj->getNumber() == 1015 /* OYSTER */ ||
-                                    obj->getNumber() == 1019 /* FOOD */) {
+                                if (obj->getNumber() == 1019 /* FOOD */) {
                                     this->player->removeObject(obj);
                                     return "You just ate: " + obj->getInventoryMessage();
                                 } else {
@@ -344,14 +376,22 @@ string Game::parseInput(string input) {
                             
                         // 2015 DRINK
                         case 2015:
+                            obj = this->data->getObjectByNumber(20);
+                            // TODO: why is the bottle not found?
                             if (this->player->hasObject(obj)) {
                                 // WATER
-                                if (obj->getNumber() == 1021 && obj->getPropertyValue() == 0) {
-                                    obj->setPropertyValue(1); // 100	THERE IS AN EMPTY BOTTLE HERE.
-                                    return "You just drank: " + obj->getInventoryMessage();
+                                if (obj->getNumber() == 1020) {
+                                    if (obj->getPropertyValue() == 0) {
+                                        obj->setPropertyValue(1); // 100	THERE IS AN EMPTY BOTTLE HERE.
+                                        return "\nYou just drank: " + obj->getInventoryMessage();
+                                    } else {
+                                        return "The bottle is empty.";
+                                    }
                                 } else {
                                     return "You cannot drink this.";
                                 }
+                            } else {
+                                return "You are not carrying any bottle to drink from.";
                             }
                         break;
                             
@@ -365,11 +405,30 @@ string Game::parseInput(string input) {
                             
                         // 2022 FILL
                         case 2022:
-                            break;
+                            if (obj->getNumber() == 1020) {
+                                if (this->player->hasObject(obj)) {
+                                    if (this->player->getCurrentLocation()->isAsset(2) && /* LIQUID ASSET */
+                                        !this->player->getCurrentLocation()->isAsset(1) /* OFF FOR WATER */) {
+                                        if (obj->getPropertyValue() == 1 /* 1 == empty bottle */) {
+                                            obj->setPropertyValue(0); // Bottle is full with water
+                                            return "The bottle is now full of water.";
+                                        } else {
+                                            return "The bottle is full already.";
+                                        }
+                                    } else {
+                                        return "There is no water to fill the bottle with at this location.";
+                                    }
+                                } else {
+                                    return "You are not carrying a bottle.";
+                                }
+                            } else {
+                                return "You cannot fill this object.";
+                            }
+                        break;
                             
                         default:
-                        
-                            break;
+                            return verb->getDefaultMessage();
+                        break;
                     }
                     
                 }

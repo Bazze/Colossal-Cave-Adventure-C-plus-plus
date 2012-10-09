@@ -13,12 +13,11 @@ ActionVerb::ActionVerb(int number, string word, string comment) : Word(number, w
 }
 
 ActionVerb::~ActionVerb() {
-    // The data class will take care of this
-    // delete this->defaultMessage;
+    
 }
 
 void ActionVerb::setDefaultMessage(Message* msg) {
-    
+    this->defaultMessage = msg;
 }
 const string ActionVerb::getDefaultMessage() {
     if (this->defaultMessage != NULL) {
@@ -32,5 +31,5 @@ Message* ActionVerb::getDefaultMessageObject() {
 }
 
 const string ActionVerb::toString() {
-    return "Type: ActionVerb\n" + this->showSpec();
+    return "Type: ActionVerb\nDefault message:\n" + this->getDefaultMessage() + "\n" + this->showSpec();
 }
