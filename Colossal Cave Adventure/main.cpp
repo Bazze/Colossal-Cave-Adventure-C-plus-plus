@@ -59,8 +59,8 @@ int main(int argc, const char * argv[])
 	}
     
 	/* Create a new Session ID */
-	sid = setsid();
-	if(sid < 0) {
+	sID = setsid();
+	if(sID < 0) {
 		cerr << "ERROR: Unable to get a good Session ID" << endl;
 		exit(1);
 	}
