@@ -41,29 +41,29 @@ int main(int argc, const char * argv[])
        inspiration for the Network code! */
 	   
 	/* Process ID and Session ID */
-	pid_t pID, sID;
+	//pid_t pID, sID;
 	   
 	/* Foring oof the process */
-	pID = fork();
+	//pID = fork();
 	
 	/* Check for good pID */
-	if(pID < 0) {
+	/*if(pID < 0) {
 		cerr << "ERROR: Unable to get a good Process ID" << endl;
 		exit(1);
-	}
+	}*/
 	
 	/* Exit the parent process if the pID is good */
-	if(pID > 0) {
+	/*if(pID > 0) {
 		std::cout << "Becoming a Daemon!\n";
 		exit(0);
-	}
+	}*/
     
 	/* Create a new Session ID */
-	sID = setsid();
+	/*sID = setsid();
 	if(sID < 0) {
 		cerr << "ERROR: Unable to get a good Session ID" << endl;
 		exit(1);
-	}
+	}*/
 	
     /* The Server Port, can be replaced by atoi(argv[1]) for usage with args */
     unsigned short serverPort = 10254;

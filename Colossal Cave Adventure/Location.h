@@ -94,6 +94,7 @@ public:
     
     void addLocationCondition(LocationCondition* locC);
     LocationCondition* getLocationConditionForLocation(Location* loc) const;
+    LocationCondition* getLocationConditionAfterLocationCondition(LocationCondition* locC) const;
     
     string toString();
 };

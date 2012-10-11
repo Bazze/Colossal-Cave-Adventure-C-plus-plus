@@ -287,7 +287,9 @@ void Data::parseLines(ifstream &dataFile) {
                         currentLocation->addAccessibleLocation(accessibleLocation);
                         
                         // Add the condition for going to this location
-                        this->locationConditions->push_back(new LocationCondition(Y/1000, currentLocation, accessibleLocation));
+                        LocationCondition* cond = new LocationCondition(Y/1000, currentLocation, accessibleLocation);
+                        this->locationConditions->push_back(cond);
+                        currentLocation->addLocationCondition(cond);
                         
                         // Add the possible MotionVerbs which can be used to go to this location
                         int verbNr = -1;
@@ -436,14 +438,11 @@ void Data::parseLines(ifstream &dataFile) {
                     currentMessage = this->getMessageByNumber(idNumber);
                     
                     if (currentMessage == NULL) {
-                        currentMessage = new Message(idNumber, lineVector.at(1));
+                        currentMessage = new Message(idNumber);
                         this->messages->push_back(currentMessage);
-                    } else {
-                        currentMessage->appendContent(lineVector.at(1));
                     }
-                } else {
-                    currentMessage->appendContent(lineVector.at(1));
                 }
+                currentMessage->appendContent(lineVector.at(1));
             }
             break;
 

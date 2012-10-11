@@ -189,13 +189,24 @@ Message* Location::shouldPrintMessage(MotionVerb* verb) {
 }
 
 void Location::addLocationCondition(LocationCondition *locC) {
-    
+    this->locationConditions->push_back(locC);
 }
 LocationCondition* Location::getLocationConditionForLocation(Location *loc) const {
     for (int i = 0; i < this->locationConditions->size(); i++) {
         // OK to compare pointers
         if (this->locationConditions->at(i)->getToLocation() == loc) {
             return this->locationConditions->at(i);
+        }
+    }
+    return NULL;
+}
+LocationCondition* Location::getLocationConditionAfterLocationCondition(LocationCondition* locC) const {
+    for (int i = 0; i < this->locationConditions->size(); i++) {
+        // OK to compare pointers
+        if (this->locationConditions->at(i) == locC) {
+            if (i != this->locationConditions->size()-1) {
+                return this->locationConditions->at(i+1);
+            }
         }
     }
     return NULL;

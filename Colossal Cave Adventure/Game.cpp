@@ -88,22 +88,27 @@ string Game::parseInput(string input) {
                     case 57:
                     {
                         loc = this->player->getCurrentLocation();
-                        vector<Object*> *objects = loc->getObjects();
-                        string message = "";
-                        for (int i = 0; i < objects->size(); i++) {
-                            message += (i != 0 ? "\n\n" : "") + objects->at(i)->getCurrentPropertyDescription();
+                        if (loc->isAsset(0) || (!loc->isAsset(0) && this->player->hasObject(this->data->getObjectByNumber(2)) && this->data->getObjectByNumber(2)->isLit()) ) {
+                            vector<Object*> *objects = loc->getObjects();
+                            string message = "";
+                            for (int i = 0; i < objects->size(); i++) {
+                                message += (i != 0 ? "\n\n" : "") + objects->at(i)->getCurrentPropertyDescription();
+                            }
+                            
+                            if (message == "") {
+                                message = "You see nothing out of the ordinary.";
+                            }
+                            
+                            return message;
+                        } else {
+                            return "IT IS PITCH DARK, YOU CAN'T SEE A THING.";
                         }
-                        
-                        if (message == "") {
-                            message = "You see nothing out of the ordinary.";
-                        }
-                        
-                        return message;
                     }
                     break;
                         
                     default:
                     {
+                        int M = 0;
                         // Printing messages overrides going to a new location, therefore we check that first
                         if ( (msg = this->player->getCurrentLocation()->shouldPrintMessage(verb)) != NULL) {
                             // Print out message to player
@@ -111,11 +116,19 @@ string Game::parseInput(string input) {
                         } else if ( (loc = this->player->getCurrentLocation()->shouldGoToLocation(verb)) != NULL ) {
                             bool allowed = false;
                             string msg = "";
+                            Location* currentLocation = this->player->getCurrentLocation();
                             
                             // Let see if all conditions are met
-                            LocationCondition* cond = this->player->getCurrentLocation()->getLocationConditionForLocation(loc);
-                            if (cond != NULL) {
-                                int M = cond->getCondition();
+                            LocationCondition* cond = currentLocation->getLocationConditionForLocation(loc);
+                            
+                            // Handle cases where there are no LocationConditions (there shouldn't be any, but just in case)
+                            if (cond == NULL) {
+                                allowed = true;
+                            }
+                            
+                            while (cond != NULL && !allowed) {
+                                loc = cond->getToLocation();
+                                M = cond->getCondition();
                                 
                                 // IF M=0		IT'S UNCONDITIONAL.
                                 if (M == 0) {
@@ -137,19 +150,17 @@ string Game::parseInput(string input) {
                                 // IF 100<M<=200	HE MUST BE CARRYING OBJECT M-100.
                                 else if (M > 100 && M <= 200) {
                                     Object* obj = this->data->getObjectByNumber(M-100);
-                                    if (obj != NULL) {
-                                        if (this->player->hasObject(obj)) {
-                                            allowed = true;
-                                        } else {
-                                            msg = "You must be carrying " + obj->getInventoryMessage();
-                                        }
+                                    if (this->player->hasObject(obj)) {
+                                        allowed = true;
+                                    } else {
+                                        msg = "You must be carrying " + obj->getInventoryMessage();
                                     }
                                 }
                                 // IF 200<M<=300	MUST BE CARRYING OR IN SAME ROOM AS M-200.
                                 else if (M > 200 && M <= 300) {
                                     Object* obj = this->data->getObjectByNumber(M-200);
                                     if (obj != NULL) {
-                                        if (this->player->hasObject(obj) || this->player->getCurrentLocation()->hasObject(obj)) {
+                                        if (this->player->hasObject(obj) || currentLocation->hasObject(obj)) {
                                             allowed = true;
                                         } else {
                                             msg = "You must be carrying or be in the same room as " + obj->getInventoryMessage();
@@ -163,7 +174,11 @@ string Game::parseInput(string input) {
                                         if (obj->getPropertyValue() != 0) {
                                             allowed = true;
                                         } else {
-                                            msg = "Property value must not be 0.";
+                                            if (loc->getNumber() == 9 && obj->getNumber() == 1003) {
+                                                msg = this->data->getMessageByNumber(63)->getContent();
+                                            } else {
+                                                msg = "Property value must not be 0.";
+                                            }
                                         }
                                     }
                                 }
@@ -189,16 +204,25 @@ string Game::parseInput(string input) {
                                         }
                                     }
                                 }
-                            } else {
-                                allowed = true;
+                                
+                                // If not allowed, get next condition
+                                if (!allowed) {
+                                    cond = currentLocation->getLocationConditionAfterLocationCondition(cond);
+                                }
                             }
                             
-                            if (allowed) {
+                            // All requirements were not met
+                            if (!allowed) {
+                                return msg;
+                            }
+                            // All requirements met
+                            else {
+                                /*stringstream ss;
+                                ss << "Going to: " << loc->getNumber() << ", M: " << M << endl;
+                                msg = ss.str();*/
                                 // Go to new location
                                 this->player->setCurrentLocation(loc);
                                 return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription() + this->getHint(loc);
-                            } else {
-                                return msg;
                             }
                         }
                     }
@@ -257,19 +281,47 @@ string Game::parseInput(string input) {
                     switch (verb->getNumber()) {
                         // 2001 CARRY TAKE KEEP CATCH STEAL CAPTU GET TOTE
                         case 2001:
-                            if (this->player->getCurrentLocation()->hasObject(obj)) {
-                                // Pick up the object from the current location
-                                this->player->getCurrentLocation()->removeObject(obj);
-                                // Add it to the player
-                                this->player->pickUpObject(obj);
-                                return "You picked up: " + obj->getInventoryMessage();
+                        {
+                            Location* currentLocation = this->player->getCurrentLocation();
+                            // Names beginning with a star is not possible to pick up (we think)
+                            if (obj->getInventoryMessage().substr(0, 1) != "*") {
+                                if (currentLocation->isAsset(0) /* THERE IS LIGHT */ ||
+                                    (
+                                     !currentLocation->isAsset(0) &&
+                                     this->player->hasObject(this->data->getObjectByNumber(2)) &&
+                                     this->data->getObjectByNumber(2)->isLit()
+                                     )
+                                    ) {
+                                    if (currentLocation->hasObject(obj)) {
+                                        if (obj->getNumber() != 1008 /* BIRD */ || (obj->getNumber() == 1008 && !this->player->hasObject(this->data->getObjectByNumber(5)) /* ROD */)) {
+                                            // Pick up the object from the current location
+                                            currentLocation->removeObject(obj);
+                                            // Add it to the player
+                                            this->player->pickUpObject(obj);
+                                            return "You picked up: " + obj->getInventoryMessage();
+                                        } else {
+                                            // 26	THE BIRD WAS UNAFRAID WHEN YOU ENTERED, BUT AS YOU APPROACH IT BECOMES
+                                            // 26	DISTURBED AND YOU CANNOT CATCH IT.
+                                            return this->data->getMessageByNumber(26)->getContent();
+                                        }
+                                    } else {
+                                        return "There is no such object at this location.";
+                                    }
+                                } else {
+                                    // To dark, cant find
+                                    return "IT IS TO DARK TO FIND ANYTHING AROUND HERE.";
+                                }
                             } else {
-                                return "There is no such object at this location.";
+                                // cannot pick up
+                                // 25	YOU CAN'T BE SERIOUS!
+                                return this->data->getMessageByNumber(25)->getContent();
                             }
+                        }
                         break;
                             
                         // 2002 DROP RELEA FREE DISCA DUMP
                         case 2002:
+                        {
                             if (this->player->hasObject(obj)) {
                                 // Drop object
                                 this->player->dropObject(obj);
@@ -279,10 +331,12 @@ string Game::parseInput(string input) {
                             } else {
                                 return "You don't have this object in your inventory.";
                             }
+                        }
                         break;
                             
                         // 2004 UNLOC OPEN
                         case 2004:
+                        {
                             if (obj->getNumber() == 1014 /* CLAM */) {
                                 // 1018	KNIFE KNIVE
                                 if (this->player->hasObject(this->data->getObjectByNumber(18))) {
@@ -314,40 +368,81 @@ string Game::parseInput(string input) {
                                     // 123	YOU DON'T HAVE ANYTHING STRONG ENOUGH TO OPEN THE OYSTER.
                                     return this->data->getMessageByNumber(123)->getContent();
                                 }
+                            } else if (obj->getNumber() == 1003 /* GRATE */) {
+                                if (this->player->getCurrentLocation()->hasObject(obj)) {
+                                    if (this->player->hasObject(this->data->getObjectByNumber(1)) /* KEYS */) {
+                                        if (obj->getPropertyValue() == 0) {
+                                            obj->setPropertyValue(1);
+                                            return this->data->getMessageByNumber(36)->getContent();
+                                        } else {
+                                            // Already unlocked
+                                            return this->data->getMessageByNumber(37)->getContent();
+                                        }
+                                    } else {
+                                        // No keys
+                                        return this->data->getMessageByNumber(31)->getContent();
+                                    }
+                                } else {
+                                    return "THERE IS NO GRATE AROUND HERE.";
+                                }
                             }
+                        }
                         break;
                             
                         // 2006 LOCK CLOSE
                         case 2006:
-                        
+                        {
+                            if (obj->getNumber() == 1003 /* GRATE */) {
+                                if (this->player->getCurrentLocation()->hasObject(obj)) {
+                                    if (this->player->hasObject(this->data->getObjectByNumber(1)) /* KEYS */) {
+                                        if (obj->getPropertyValue() == 1) {
+                                            obj->setPropertyValue(0);
+                                            return this->data->getMessageByNumber(35)->getContent();
+                                        } else {
+                                            // Already locked
+                                            return this->data->getMessageByNumber(34)->getContent();
+                                        }
+                                    } else {
+                                        // No keys
+                                        return this->data->getMessageByNumber(31)->getContent();
+                                    }
+                                } else {
+                                    return "THERE IS NO GRATE AROUND HERE.";
+                                }
+                            }
+                        }
                         break;
                             
                         // 2007 LIGHT ON
                         case 2007:
+                        {
                             if (this->player->hasObject(obj)) {
                                 if (!obj->isLit()) {
                                     obj->setLit(true);
-                                    return "You switched the brass lantern on.";
+                                    return this->data->getMessageByNumber(39)->getContent();
                                 } else {
                                     return "This lamp is already lit.";
                                 }
                             } else {
                                 return "You do not have this object so you can't switch it on.";
                             }
+                        }
                         break;
                             
                         // 2008 EXTIN OFF
                         case 2008:
+                        {
                             if (this->player->hasObject(obj)) {
                                 if (obj->isLit()) {
                                     obj->setLit(false);
-                                    return "You switched the brass lantern off.";
+                                    return this->data->getMessageByNumber(40)->getContent();
                                 } else {
                                     return "This brass lantern is already off.";
                                 }
                             } else {
                                 return "You do not have this object so you can't switch it off.";
                             }
+                        }
                         break;
                             
                         // 2009 WAVE SHAKE SWING
@@ -362,8 +457,17 @@ string Game::parseInput(string input) {
                         case 2012:
                             break;
                             
+                        // 2013 POUR
+                        case 2013:
+                        {
+                            // 77	YOUR BOTTLE IS EMPTY AND THE GROUND IS WET.
+                            // 78	YOU CAN'T POUR THAT.
+                        }
+                            break;
+                            
                         // 2014 EAT DEVOU
                         case 2014:
+                        {
                             if (this->player->hasObject(obj)) {
                                 if (obj->getNumber() == 1019 /* FOOD */) {
                                     this->player->removeObject(obj);
@@ -371,11 +475,16 @@ string Game::parseInput(string input) {
                                 } else {
                                     return "You cannot eat this.";
                                 }
+                            } else {
+                                // 174	THERE IS NOTHING HERE TO EAT.
+                                return this->data->getMessageByNumber(174)->getContent();
                             }
+                        }
                         break;
                             
                         // 2015 DRINK
                         case 2015:
+                        {
                             obj = this->data->getObjectByNumber(20);
                             // TODO: why is the bottle not found?
                             if (this->player->hasObject(obj)) {
@@ -393,6 +502,7 @@ string Game::parseInput(string input) {
                             } else {
                                 return "You are not carrying any bottle to drink from.";
                             }
+                        }
                         break;
                             
                         // 2016 RUB
@@ -405,25 +515,32 @@ string Game::parseInput(string input) {
                             
                         // 2022 FILL
                         case 2022:
+                        {
                             if (obj->getNumber() == 1020) {
                                 if (this->player->hasObject(obj)) {
                                     if (this->player->getCurrentLocation()->isAsset(2) && /* LIQUID ASSET */
                                         !this->player->getCurrentLocation()->isAsset(1) /* OFF FOR WATER */) {
                                         if (obj->getPropertyValue() == 1 /* 1 == empty bottle */) {
                                             obj->setPropertyValue(0); // Bottle is full with water
-                                            return "The bottle is now full of water.";
+                                            // 107	YOUR BOTTLE IS NOW FULL OF WATER.
+                                            return this->data->getMessageByNumber(107)->getContent();
                                         } else {
-                                            return "The bottle is full already.";
+                                            // 105	YOUR BOTTLE IS ALREADY FULL.
+                                            return this->data->getMessageByNumber(105)->getContent();
                                         }
                                     } else {
-                                        return "There is no water to fill the bottle with at this location.";
+                                        // 106	THERE IS NOTHING HERE WITH WHICH TO FILL THE BOTTLE.
+                                        return this->data->getMessageByNumber(106)->getContent();
                                     }
                                 } else {
-                                    return "You are not carrying a bottle.";
+                                    // 104	YOU HAVE NOTHING IN WHICH TO CARRY IT.
+                                    return this->data->getMessageByNumber(104)->getContent();
                                 }
                             } else {
-                                return "You cannot fill this object.";
+                                // 109	YOU CAN'T FILL THAT.
+                                return this->data->getMessageByNumber(109)->getContent();
                             }
+                        }
                         break;
                             
                         default:

@@ -7,6 +7,7 @@
 //
 
 #include "LocationCondition.h"
+#include "Location.h"
 
 LocationCondition::LocationCondition(int cond, Location* from, Location* to) {
     this->condition = cond;
