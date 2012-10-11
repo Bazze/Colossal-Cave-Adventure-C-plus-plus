@@ -475,6 +475,13 @@ string Game::parseInput(string input) {
                                 } else {
                                     return "You cannot eat this.";
                                 }
+                            } else if (this->player->getCurrentLocation()->hasObject(obj)) {
+                                if (obj->getNumber() == 1019) {
+                                    this->player->getCurrentLocation()->removeObject(obj);
+                                    return "You just ate: " + obj->getInventoryMessage();
+                                } else {
+                                    return "You cannot eat this.";
+                                }
                             } else {
                                 // 174	THERE IS NOTHING HERE TO EAT.
                                 return this->data->getMessageByNumber(174)->getContent();
