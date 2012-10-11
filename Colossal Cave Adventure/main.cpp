@@ -19,61 +19,77 @@
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
 
 
 const int RECEIVEBUFFERSIZE = 128;
+bool  SIGHUPSENT = false;
 
 void HandleTCPClient(TCPSocket *socket, Game* game);
 bool exitMsg(char *buffer);
+void sighupHandler(int sigInt);
 void *ThreadMain(void *arg);
 
 
+void sighupHandler(int sigInt) {
+    syslog(LOG_INFO, "SIGHUP Caught");
+    SIGHUPSENT = true;
+}
+
 int main(int argc, const char * argv[])
 {
+    signal(SIGHUP,sighupHandler);
     
     // insert code here...
     std::cout << "Hello, World!\n";
     
     /* The Server Code */
-    /* A big Thank You to Professor Michael J. Donahoo 
-       at the School of Engineering & Computer Science 
-       at Baylor University for the Wrapper class and 
-       inspiration for the Network code! */
-	   
+    /* A big Thank You to Professor Michael J. Donahoo
+     at the School of Engineering & Computer Science
+     at Baylor University for the Wrapper class and
+     inspiration for the Network code! */
+    
 	/* Process ID and Session ID */
-	//pid_t pID, sID;
-	   
+	pid_t pID, sID;
+    
 	/* Foring oof the process */
-	//pID = fork();
+	pID = fork();
 	
 	/* Check for good pID */
-	/*if(pID < 0) {
-		cerr << "ERROR: Unable to get a good Process ID" << endl;
-		exit(1);
-	}*/
+	if(pID < 0) {
+     cerr << "ERROR: Unable to get a good Process ID" << endl;
+     exit(1);
+     }
 	
 	/* Exit the parent process if the pID is good */
-	/*if(pID > 0) {
-		std::cout << "Becoming a Daemon!\n";
-		exit(0);
-	}*/
+	if(pID > 0) {
+     std::cout << "Becoming a Daemon!\n";
+     exit(0);
+     }
     
 	/* Create a new Session ID */
-	/*sID = setsid();
-	if(sID < 0) {
-		cerr << "ERROR: Unable to get a good Session ID" << endl;
-		exit(1);
-	}*/
-	
+	sID = setsid();
+     if(sID < 0) {
+     cerr << "ERROR: Unable to get a good Session ID" << endl;
+     exit(1);
+     }
+    
+    if((chdir("/"))<0) {
+        exit(1);
+    }
+    
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+    
     /* The Server Port, can be replaced by atoi(argv[1]) for usage with args */
     unsigned short serverPort = 10254;
     
     try {
         
         TCPServerSocket serverSocket(serverPort);
-        
         /* This loop will run forever */
-        for (;;) {      
+        for (;;) {
             
             TCPSocket *clntSock = serverSocket.accept();
             
@@ -134,8 +150,14 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
     
     string returnMsg = "";
     char clientBuffer[RECEIVEBUFFERSIZE];
-
+    
     while (1) {
+        
+        /* Check if SIGHUP is caught */
+        if(SIGHUPSENT){
+            break;
+        }
+        	
         /* Get the message from the socket */
         sock->recv(clientBuffer, RECEIVEBUFFERSIZE);
         

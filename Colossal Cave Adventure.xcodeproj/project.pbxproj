@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7973F946161DAACE00F6C4A5 /* PracticalSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7973F944161DAACE00F6C4A5 /* PracticalSocket.cpp */; };
 		A942019F1623077A000F0C1B /* LocationCondition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A942019D16230779000F0C1B /* LocationCondition.cpp */; };
 		A97F2055161F372200D7C7F6 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A97F2053161F372100D7C7F6 /* Player.cpp */; };
 		A97F2059161F3DE900D7C7F6 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A97F2057161F3DE900D7C7F6 /* Game.cpp */; };
@@ -49,7 +48,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7973F944161DAACE00F6C4A5 /* PracticalSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PracticalSocket.cpp; sourceTree = "<group>"; };
 		7973F945161DAACE00F6C4A5 /* PracticalSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PracticalSocket.h; sourceTree = "<group>"; };
 		A942019D16230779000F0C1B /* LocationCondition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LocationCondition.cpp; sourceTree = "<group>"; };
 		A942019E1623077A000F0C1B /* LocationCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationCondition.h; sourceTree = "<group>"; };
@@ -107,7 +105,6 @@
 		79954790161D9CC40045318D /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				7973F944161DAACE00F6C4A5 /* PracticalSocket.cpp */,
 				7973F945161DAACE00F6C4A5 /* PracticalSocket.h */,
 			);
 			name = Networking;
@@ -266,7 +263,6 @@
 				A9D70446161B0ED30000B455 /* ClassMessage.cpp in Sources */,
 				A9D70449161B1F080000B455 /* Hint.cpp in Sources */,
 				A9D7044C161C23C00000B455 /* MagicMessage.cpp in Sources */,
-				7973F946161DAACE00F6C4A5 /* PracticalSocket.cpp in Sources */,
 				A97F2055161F372200D7C7F6 /* Player.cpp in Sources */,
 				A97F2059161F3DE900D7C7F6 /* Game.cpp in Sources */,
 				A942019F1623077A000F0C1B /* LocationCondition.cpp in Sources */,
@@ -339,6 +335,11 @@
 		A9AB95C716171648006E3FCF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Colossal Cave Adventure\"",
+					"\"$(SRCROOT)/..\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -346,6 +347,11 @@
 		A9AB95C816171648006E3FCF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/Colossal Cave Adventure\"",
+					"\"$(SRCROOT)/..\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
