@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A942019F1623077A000F0C1B /* LocationCondition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A942019D16230779000F0C1B /* LocationCondition.cpp */; };
+		A94201D316273E98000F0C1B /* libPracticalSocket.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A94201D216273E98000F0C1B /* libPracticalSocket.dylib */; };
 		A97F2055161F372200D7C7F6 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A97F2053161F372100D7C7F6 /* Player.cpp */; };
 		A97F2059161F3DE900D7C7F6 /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A97F2057161F3DE900D7C7F6 /* Game.cpp */; };
 		A9AB95C116171648006E3FCF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A9AB95C016171648006E3FCF /* main.cpp */; };
@@ -51,6 +52,7 @@
 		7973F945161DAACE00F6C4A5 /* PracticalSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PracticalSocket.h; sourceTree = "<group>"; };
 		A942019D16230779000F0C1B /* LocationCondition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LocationCondition.cpp; sourceTree = "<group>"; };
 		A942019E1623077A000F0C1B /* LocationCondition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationCondition.h; sourceTree = "<group>"; };
+		A94201D216273E98000F0C1B /* libPracticalSocket.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libPracticalSocket.dylib; path = "Colossal Cave Adventure/libPracticalSocket.dylib"; sourceTree = "<group>"; };
 		A97F2053161F372100D7C7F6 /* Player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Player.cpp; sourceTree = "<group>"; };
 		A97F2054161F372200D7C7F6 /* Player.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Player.h; sourceTree = "<group>"; };
 		A97F2057161F3DE900D7C7F6 /* Game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Game.cpp; sourceTree = "<group>"; };
@@ -89,6 +91,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A94201D316273E98000F0C1B /* libPracticalSocket.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,6 +116,7 @@
 		A9AB95B116171648006E3FCF = {
 			isa = PBXGroup;
 			children = (
+				A94201D216273E98000F0C1B /* libPracticalSocket.dylib */,
 				A9AB95BF16171648006E3FCF /* Colossal Cave Adventure */,
 				A9AB95BD16171648006E3FCF /* Products */,
 			);
