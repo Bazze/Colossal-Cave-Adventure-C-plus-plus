@@ -220,9 +220,10 @@ string Game::parseInput(string input) {
                                 /*stringstream ss;
                                 ss << "Going to: " << loc->getNumber() << ", M: " << M << endl;
                                 msg = ss.str();*/
+                                // 16	IT IS NOW PITCH DARK.  IF YOU PROCEED YOU WILL LIKELY FALL INTO A PIT.
                                 // Go to new location
                                 this->player->setCurrentLocation(loc);
-                                return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription() + this->getHint(loc);
+                                return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription() + (!loc->isAsset(0) ? "\n\n" + this->data->getMessageByNumber(16)->getContent() : "") + this->getHint(loc);
                             }
                         }
                     }
@@ -293,17 +294,33 @@ string Game::parseInput(string input) {
                                      )
                                     ) {
                                     if (currentLocation->hasObject(obj)) {
-                                        if (obj->getNumber() != 1008 /* BIRD */ || (obj->getNumber() == 1008 && !this->player->hasObject(this->data->getObjectByNumber(5)) /* ROD */)) {
+                                        if (obj->getNumber() != 1008 /* BIRD */) {
                                             // Pick up the object from the current location
                                             currentLocation->removeObject(obj);
                                             // Add it to the player
                                             this->player->pickUpObject(obj);
                                             return "You picked up: " + obj->getInventoryMessage();
-                                        } else {
-                                            // 26	THE BIRD WAS UNAFRAID WHEN YOU ENTERED, BUT AS YOU APPROACH IT BECOMES
-                                            // 26	DISTURBED AND YOU CANNOT CATCH IT.
-                                            return this->data->getMessageByNumber(26)->getContent();
-                                        }
+                                        } else if (obj->getNumber() == 1008) {
+                                            if (this->player->hasObject(this->data->getObjectByNumber(4)) /* CAGE */) {
+                                                if (!this->player->hasObject(this->data->getObjectByNumber(5)) /* ROD */) {
+                                                    // Pick up the object from the current location
+                                                    currentLocation->removeObject(obj);
+                                                    // Add it to the player
+                                                    this->player->pickUpObject(obj);
+                                                    
+                                                    // 100	THERE IS A LITTLE BIRD IN THE CAGE.
+                                                    obj->setPropertyValue(1);
+                                                    return "You picked up: " + obj->getInventoryMessage();
+                                                } else {
+                                                    // 26	THE BIRD WAS UNAFRAID WHEN YOU ENTERED, BUT AS YOU APPROACH IT BECOMES
+                                                    // 26	DISTURBED AND YOU CANNOT CATCH IT.
+                                                    return this->data->getMessageByNumber(26)->getContent();
+                                                }
+                                            } else {
+                                                // 27	YOU CAN CATCH THE BIRD, BUT YOU CANNOT CARRY IT.
+                                                return this->data->getMessageByNumber(27)->getContent();
+                                            }
+                                        } 
                                     } else {
                                         return "There is no such object at this location.";
                                     }
