@@ -21,7 +21,7 @@
 
 Game::Game() {
     // This will parse the data file
-    this->data = new Data();
+    this->data = new Data("/advent.dat");
     
     Location* startingLocation = this->data->getLocationByNumber(1);
     this->player = new Player(startingLocation);
