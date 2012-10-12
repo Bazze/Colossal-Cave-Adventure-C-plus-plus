@@ -217,7 +217,8 @@ void *ThreadMain(void *clntSock) {
     delete game;
     delete (TCPSocket *) clntSock;
     return NULL;
+}
 
 void destroy(int sigint) {
     //
-}}
+}
