@@ -41,7 +41,7 @@ void sighupHandler(int sigInt) {
     for(int i = 0; i < vThreads.size(); i++){
         pthread_join(vThreads[i], NULL);
     }
-    exit(0);
+
 }
 
 int main(int argc, const char * argv[])
@@ -189,18 +189,28 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
         }
         
         if(str != "") {
-        cout << sock->getForeignAddress() << ":" << sock->getForeignPort() << " says: " << str << endl;
-        returnMsg = game->parseInput(str);
-        if (returnMsg != "") {
-            returnMsg += "\n";
+            cout << sock->getForeignAddress() << ":" << sock->getForeignPort() << " says: " << str << endl;
+            returnMsg = game->parseInput(str);
+            if (returnMsg != "") {
+                returnMsg += "\n";
+            }
+            returnMsg += "> ";
+            
+            const char *returnBuffer = returnMsg.c_str();
+            sock->send(returnBuffer, returnMsg.length()+1);
         }
-        returnMsg += "> ";
-        
-        const char *returnBuffer = returnMsg.c_str();
-        sock->send(returnBuffer, returnMsg.length()+1);
-        }
         
         
+    }
+    
+    if(SIGHUPSENT) {
+        string str = "Closing socket due to SIGHUP\n\n";
+        const char *p = str.c_str();
+        sock->send(p, str.length()+1);
+    } else {
+        string str = "Closing socket due to quitcommand\n\n";
+        const char *p = str.c_str();
+        sock->send(p, str.length()+1);
     }
     /* Destructor closes socket */
 }
