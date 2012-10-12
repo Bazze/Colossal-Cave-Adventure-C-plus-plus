@@ -223,7 +223,7 @@ string Game::parseInput(string input) {
                                 // 16	IT IS NOW PITCH DARK.  IF YOU PROCEED YOU WILL LIKELY FALL INTO A PIT.
                                 // Go to new location
                                 this->player->setCurrentLocation(loc);
-                                return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription() + (!loc->isAsset(0) ? "\n\n" + this->data->getMessageByNumber(16)->getContent() : "") + this->getHint(loc);
+                                return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription() + (!loc->isAsset(0) && (!this->player->hasObject(this->data->getObjectByNumber(2)) || (this->player->hasObject(this->data->getObjectByNumber(2)) && !this->data->getObjectByNumber(2)->isLit())) ? "\n\n" + this->data->getMessageByNumber(16)->getContent() : "") + this->getHint(loc);
                             }
                         }
                     }
