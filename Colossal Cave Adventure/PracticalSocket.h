@@ -165,6 +165,8 @@ public:
      */
     int recv(void *buffer, int bufferLen) throw(SocketException);
     
+    int recvtimeout(char *buffer, int bufferLen, int timeout);
+    
     /**
      *   Get the foreign address.  Call connect() before calling recv()
      *   @return foreign address

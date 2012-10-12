@@ -36,10 +36,10 @@ void *ThreadMain(void *arg);
 
 void sighupHandler(int sigInt) {
     syslog(LOG_INFO, "SIGHUP Caught");
-    SIGHUPSENT = true;
     sleep(30);
+    SIGHUPSENT = true;
     for(int i = 0; i < vThreads.size(); i++){
-        pthread_cancel(vThreads[i]);
+        pthread_join(vThreads[i], NULL);
     }
     exit(0);
 }
@@ -167,11 +167,16 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
         }
         
         /* Get the message from the socket */
-        sock->recv(clientBuffer, RECEIVEBUFFERSIZE);
+        sock->recvtimeout(clientBuffer, RECEIVEBUFFERSIZE, 5);
         
         
         /* Check if the Exit Messagge is received*/
         if(exitMsg(clientBuffer)) {
+            break;
+        }
+        
+        /* Check if SIGHUP is caught */
+        if(SIGHUPSENT){
             break;
         }
         
@@ -180,9 +185,11 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
         for(int i = 0; i < RECEIVEBUFFERSIZE/8; i++){
             if (!::isprint(clientBuffer[i])) break;
             str+=clientBuffer[i];
+            clientBuffer[i] = NULL;
         }
-        cout << sock->getForeignAddress() << ":" << sock->getForeignPort() << " says: " << str << endl;
         
+        if(str != "") {
+        cout << sock->getForeignAddress() << ":" << sock->getForeignPort() << " says: " << str << endl;
         returnMsg = game->parseInput(str);
         if (returnMsg != "") {
             returnMsg += "\n";
@@ -191,6 +198,8 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
         
         const char *returnBuffer = returnMsg.c_str();
         sock->send(returnBuffer, returnMsg.length()+1);
+        }
+        
         
     }
     /* Destructor closes socket */
@@ -198,7 +207,6 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
 
 void *ThreadMain(void *clntSock) {
     syslog(LOG_INFO, "A player joined the game.");
-    
     
     Game* game = new Game();
     string str = "\n\n\n\n\n\n\n\n\n\n\n" + game->getPlayer()->getCurrentLocation()->getShortDescription() + (game->getPlayer()->getCurrentLocation()->getShortDescription() != "" ? "\n" : "") + game->getPlayer()->getCurrentLocation()->getLongDescription() + "\n> ";
