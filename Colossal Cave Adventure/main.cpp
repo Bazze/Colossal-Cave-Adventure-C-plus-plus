@@ -24,16 +24,24 @@
 
 const int RECEIVEBUFFERSIZE = 128;
 bool  SIGHUPSENT = false;
+vector<pthread_t> vThreads;
+
 
 void HandleTCPClient(TCPSocket *socket, Game* game);
 bool exitMsg(char *buffer);
 void sighupHandler(int sigInt);
+void destroy(int sigInt);
 void *ThreadMain(void *arg);
 
 
 void sighupHandler(int sigInt) {
     syslog(LOG_INFO, "SIGHUP Caught");
     SIGHUPSENT = true;
+    sleep(30);
+    for(int i = 0; i < vThreads.size(); i++){
+        pthread_cancel(vThreads[i]);
+    }
+    exit(0);
 }
 
 int main(int argc, const char * argv[])
@@ -53,26 +61,26 @@ int main(int argc, const char * argv[])
 	pid_t pID, sID;
     
 	/* Foring oof the process */
-	pID = fork();
+    pID = fork();
 	
 	/* Check for good pID */
 	if(pID < 0) {
-     cerr << "ERROR: Unable to get a good Process ID" << endl;
-     exit(1);
-     }
+        cerr << "ERROR: Unable to get a good Process ID" << endl;
+        exit(1);
+    }
 	
 	/* Exit the parent process if the pID is good */
-	if(pID > 0) {
-     std::cout << "Becoming a Daemon!\n";
-     exit(0);
-     }
+    if(pID > 0) {
+        std::cout << "Becoming a Daemon!\n";
+        exit(0);
+    }
     
 	/* Create a new Session ID */
 	sID = setsid();
-     if(sID < 0) {
-     cerr << "ERROR: Unable to get a good Session ID" << endl;
-     exit(1);
-     }
+    if(sID < 0) {
+        cerr << "ERROR: Unable to get a good Session ID" << endl;
+        exit(1);
+    }
     
     if((chdir("/"))<0) {
         exit(1);
@@ -157,9 +165,10 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
         if(SIGHUPSENT){
             break;
         }
-        	
+        
         /* Get the message from the socket */
         sock->recv(clientBuffer, RECEIVEBUFFERSIZE);
+        
         
         /* Check if the Exit Messagge is received*/
         if(exitMsg(clientBuffer)) {
@@ -190,14 +199,16 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
 void *ThreadMain(void *clntSock) {
     syslog(LOG_INFO, "A player joined the game.");
     
-    Game* game = new Game();
     
+    Game* game = new Game();
     string str = "\n\n\n\n\n\n\n\n\n\n\n" + game->getPlayer()->getCurrentLocation()->getShortDescription() + (game->getPlayer()->getCurrentLocation()->getShortDescription() != "" ? "\n" : "") + game->getPlayer()->getCurrentLocation()->getLongDescription() + "\n> ";
     const char *returnBuffer = str.c_str();
     ((TCPSocket *)clntSock)->send(returnBuffer, str.length()+1);
     
     // Guarantees that thread resources are deallocated upon return
     pthread_detach(pthread_self());
+    
+    vThreads.push_back(pthread_self());
     // Extract socket file descriptor from argument
     HandleTCPClient((TCPSocket *) clntSock, game);
     
@@ -206,4 +217,7 @@ void *ThreadMain(void *clntSock) {
     delete game;
     delete (TCPSocket *) clntSock;
     return NULL;
-}
+
+void destroy(int sigint) {
+    //
+}}
