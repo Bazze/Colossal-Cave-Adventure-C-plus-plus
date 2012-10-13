@@ -15,6 +15,7 @@
 #include "PracticalSocket.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
@@ -24,6 +25,7 @@
 
 const int RECEIVEBUFFERSIZE = 128;
 bool  SIGHUPSENT = false;
+bool EXITDAEMON = false;
 vector<pthread_t> vThreads;
 
 
@@ -41,7 +43,7 @@ void sighupHandler(int sigInt) {
     for(int i = 0; i < vThreads.size(); i++){
         pthread_join(vThreads[i], NULL);
     }
-
+    EXITDAEMON = true;
 }
 
 int main(int argc, const char * argv[])
@@ -94,19 +96,26 @@ int main(int argc, const char * argv[])
     unsigned short serverPort = 10254;
     
     try {
-        
+    
         TCPServerSocket serverSocket(serverPort);
         /* This loop will run forever */
-        for (;;) {
+        while(!EXITDAEMON) {
             
-            TCPSocket *clntSock = serverSocket.accept();
+            /* Old Code */
+            //TCPSocket *clntSock = serverSocket.accept();
             
-            /* Create the Thread and get the ID */
-            pthread_t threadID;
-            if (pthread_create(&threadID, NULL, ThreadMain,
-                               (void *) clntSock) != 0) {
-                cerr << "ERROR: Unable to create thread" << endl;
-                exit(1);
+            int n = ::accept(serverSocket.getSockDesc(), NULL, 0);
+            
+            if(n >= 0) {
+                TCPSocket *clntSock = new TCPSocket(n);
+                
+                /* Create the Thread and get the ID */
+                pthread_t threadID;
+                if (pthread_create(&threadID, NULL, ThreadMain,
+                                   (void *) clntSock) != 0) {
+                    cerr << "ERROR: Unable to create thread" << endl;
+                    exit(1);
+                }
             }
             
         }
@@ -115,8 +124,9 @@ int main(int argc, const char * argv[])
         exit(1);
     }
     /* won't be reached */
-    
-    return 0;
+    syslog(LOG_INFO, "Closing Daemon");
+    sleep(7); // Ensure that the threads has all been closed
+    exit(0);
 }
 
 bool exitMsg(char *buffer){

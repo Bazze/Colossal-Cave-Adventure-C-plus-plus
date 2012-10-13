@@ -207,10 +207,12 @@ public:
     TCPSocket(const string &foreignAddress, unsigned short foreignPort)
     throw(SocketException);
     
+    TCPSocket(int newConnSD);
+    
 private:
     // Access for TCPServerSocket::accept() connection creation
     friend class TCPServerSocket;
-    TCPSocket(int newConnSD);
+    
 };
 
 /**
@@ -248,6 +250,8 @@ public:
      *   @exception SocketException thrown if attempt to accept a new connection fails
      */
     TCPSocket *accept() throw(SocketException);
+    
+    int getSockDesc();
     
 private:
     void setListen(int queueLen) throw(SocketException);
