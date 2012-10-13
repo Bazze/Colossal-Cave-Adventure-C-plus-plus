@@ -56,7 +56,7 @@ int main(int argc, const char * argv[])
     /* The Server Code */
     /* A big Thank You to Professor Michael J. Donahoo
      at the School of Engineering & Computer Science
-     at Baylor University for the Wrapper class and
+     at Baylor University for the library code and
      inspiration for the Network code! */
     
 	/* Process ID and Session ID */
