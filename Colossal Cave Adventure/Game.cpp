@@ -60,6 +60,158 @@ string Game::getHint(Location* loc) const {
     return "";
 }
 
+string Game::handleMovementAndLook(vector<Word*> &spokenWords, MotionVerb* verb) {
+    Message* msg = NULL;
+    Location* loc = NULL;
+    switch (verb->getNumber()) {
+            // 57   LOOK EXAMI TOUCH DESCR
+        case 57:
+        {
+            loc = this->player->getCurrentLocation();
+            if (loc->isAsset(0) || (!loc->isAsset(0) && this->player->hasObject(this->data->getObjectByNumber(2)) && this->data->getObjectByNumber(2)->isLit()) ) {
+                vector<Object*> *objects = loc->getObjects();
+                string message = "";
+                for (int i = 0; i < objects->size(); i++) {
+                    message += (i != 0 ? "\n\n" : "") + objects->at(i)->getCurrentPropertyDescription();
+                }
+                
+                if (message == "") {
+                    message = "You see nothing out of the ordinary.";
+                }
+                
+                return message;
+            } else {
+                return "IT IS PITCH DARK, YOU CAN'T SEE A THING.";
+            }
+        }
+            break;
+            
+        default:
+        {
+            int M = 0;
+            // Printing messages overrides going to a new location, therefore we check that first
+            if ( (msg = this->player->getCurrentLocation()->shouldPrintMessage(verb)) != NULL) {
+                // Print out message to player
+                return msg->getContent();
+            } else if ( (loc = this->player->getCurrentLocation()->shouldGoToLocation(verb)) != NULL ) {
+                bool allowed = false;
+                string msg = "";
+                Location* currentLocation = this->player->getCurrentLocation();
+                
+                // Let see if all conditions are met
+                LocationCondition* cond = currentLocation->getLocationConditionForLocation(loc);
+                
+                // Handle cases where there are no LocationConditions (there shouldn't be any, but just in case)
+                if (cond == NULL) {
+                    allowed = true;
+                }
+                
+                while (cond != NULL && !allowed) {
+                    loc = cond->getToLocation();
+                    M = cond->getCondition();
+                    
+                    // IF M=0		IT'S UNCONDITIONAL.
+                    if (M == 0) {
+                        allowed = true;
+                    }
+                    // IF 0<M<100	IT IS DONE WITH M% PROBABILITY.
+                    else if (M > 0 && M < 100) {
+                        srand((unsigned)time(0));
+                        int randInt = (rand()%100)+1;
+                        if (randInt <= M) {
+                            allowed = true;
+                        }
+                    }
+                    // IF M=100	UNCONDITIONAL, BUT FORBIDDEN TO DWARVES.
+                    else if (M == 100) {
+                        // Dwarves?
+                        allowed = true;
+                    }
+                    // IF 100<M<=200	HE MUST BE CARRYING OBJECT M-100.
+                    else if (M > 100 && M <= 200) {
+                        Object* obj = this->data->getObjectByNumber(M-100);
+                        if (this->player->hasObject(obj)) {
+                            allowed = true;
+                        } else {
+                            msg = "You must be carrying " + obj->getInventoryMessage();
+                        }
+                    }
+                    // IF 200<M<=300	MUST BE CARRYING OR IN SAME ROOM AS M-200.
+                    else if (M > 200 && M <= 300) {
+                        Object* obj = this->data->getObjectByNumber(M-200);
+                        if (obj != NULL) {
+                            if (this->player->hasObject(obj) || currentLocation->hasObject(obj)) {
+                                allowed = true;
+                            } else {
+                                msg = "You must be carrying or be in the same room as " + obj->getInventoryMessage();
+                            }
+                        }
+                    }
+                    // IF 300<M<=400	PROP(M MOD 100) MUST *NOT* BE 0.
+                    else if (M > 300 && M <= 400) {
+                        Object* obj = this->data->getObjectByNumber(M%100);
+                        if (obj != NULL) {
+                            if (obj->getPropertyValue() != 0) {
+                                allowed = true;
+                            } else {
+                                if (loc->getNumber() == 9 && obj->getNumber() == 1003) {
+                                    msg = this->data->getMessageByNumber(63)->getContent();
+                                } else {
+                                    msg = "Property value must not be 0.";
+                                }
+                            }
+                        }
+                    }
+                    // IF 400<M<=500	PROP(M MOD 100) MUST *NOT* BE 1.
+                    else if (M > 400 && M <= 500) {
+                        Object* obj = this->data->getObjectByNumber(M%100);
+                        if (obj != NULL) {
+                            if (obj->getPropertyValue() != 1) {
+                                allowed = true;
+                            } else {
+                                msg = "Property value must not be 1.";
+                            }
+                        }
+                    }
+                    // IF 500<M<=600	PROP(M MOD 100) MUST *NOT* BE 2, ETC.
+                    else if (M > 500 && M <= 600) {
+                        Object* obj = this->data->getObjectByNumber(M%100);
+                        if (obj != NULL) {
+                            if (obj->getPropertyValue() != 2) {
+                                allowed = true;
+                            } else {
+                                msg = "Property value must not be 2.";
+                            }
+                        }
+                    }
+                    
+                    // If not allowed, get next condition
+                    if (!allowed) {
+                        cond = currentLocation->getLocationConditionAfterLocationCondition(cond);
+                    }
+                }
+                
+                // All requirements were not met
+                if (!allowed) {
+                    return msg;
+                }
+                // All requirements met
+                else {
+                    /*stringstream ss;
+                     ss << "Going to: " << loc->getNumber() << ", M: " << M << endl;
+                     msg = ss.str();*/
+                    // 16	IT IS NOW PITCH DARK.  IF YOU PROCEED YOU WILL LIKELY FALL INTO A PIT.
+                    // Go to new location
+                    this->player->setCurrentLocation(loc);
+                    return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription() + (!loc->isAsset(0) && (!this->player->hasObject(this->data->getObjectByNumber(2)) || (this->player->hasObject(this->data->getObjectByNumber(2)) && !this->data->getObjectByNumber(2)->isLit())) ? "\n\n" + this->data->getMessageByNumber(16)->getContent() : "") + this->getHint(loc);
+                }
+            }
+        }
+        break;
+    }
+    return "";
+}
+
 string Game::parseInput(string input) {
     vector<string> lineVector;
     vector<Word*> spokenWords = vector<Word*>();
@@ -73,162 +225,14 @@ string Game::parseInput(string input) {
             spokenWords.push_back(word);
         } else {
             // For debugging
-            cout << "Word not found: " << lineVector.at(i) << endl;
+            //cout << "Word not found: " << lineVector.at(i) << endl;
         }
     }
     
     if (spokenWords.size() > 0) {
         if (spokenWords.size() == 1) {
             if (dynamic_cast<MotionVerb*>(spokenWords.at(0))) {
-                MotionVerb* verb = (MotionVerb*)spokenWords.at(0);
-                Message* msg = NULL;
-                Location* loc = NULL;
-                switch (verb->getNumber()) {
-                    // 57   LOOK EXAMI TOUCH DESCR
-                    case 57:
-                    {
-                        loc = this->player->getCurrentLocation();
-                        if (loc->isAsset(0) || (!loc->isAsset(0) && this->player->hasObject(this->data->getObjectByNumber(2)) && this->data->getObjectByNumber(2)->isLit()) ) {
-                            vector<Object*> *objects = loc->getObjects();
-                            string message = "";
-                            for (int i = 0; i < objects->size(); i++) {
-                                message += (i != 0 ? "\n\n" : "") + objects->at(i)->getCurrentPropertyDescription();
-                            }
-                            
-                            if (message == "") {
-                                message = "You see nothing out of the ordinary.";
-                            }
-                            
-                            return message;
-                        } else {
-                            return "IT IS PITCH DARK, YOU CAN'T SEE A THING.";
-                        }
-                    }
-                    break;
-                        
-                    default:
-                    {
-                        int M = 0;
-                        // Printing messages overrides going to a new location, therefore we check that first
-                        if ( (msg = this->player->getCurrentLocation()->shouldPrintMessage(verb)) != NULL) {
-                            // Print out message to player
-                            return msg->getContent();
-                        } else if ( (loc = this->player->getCurrentLocation()->shouldGoToLocation(verb)) != NULL ) {
-                            bool allowed = false;
-                            string msg = "";
-                            Location* currentLocation = this->player->getCurrentLocation();
-                            
-                            // Let see if all conditions are met
-                            LocationCondition* cond = currentLocation->getLocationConditionForLocation(loc);
-                            
-                            // Handle cases where there are no LocationConditions (there shouldn't be any, but just in case)
-                            if (cond == NULL) {
-                                allowed = true;
-                            }
-                            
-                            while (cond != NULL && !allowed) {
-                                loc = cond->getToLocation();
-                                M = cond->getCondition();
-                                
-                                // IF M=0		IT'S UNCONDITIONAL.
-                                if (M == 0) {
-                                    allowed = true;
-                                }
-                                // IF 0<M<100	IT IS DONE WITH M% PROBABILITY.
-                                else if (M > 0 && M < 100) {
-                                    srand((unsigned)time(0));
-                                    int randInt = (rand()%100)+1;
-                                    if (randInt <= M) {
-                                        allowed = true;
-                                    }
-                                }
-                                // IF M=100	UNCONDITIONAL, BUT FORBIDDEN TO DWARVES.
-                                else if (M == 100) {
-                                    // Dwarves?
-                                    allowed = true;
-                                }
-                                // IF 100<M<=200	HE MUST BE CARRYING OBJECT M-100.
-                                else if (M > 100 && M <= 200) {
-                                    Object* obj = this->data->getObjectByNumber(M-100);
-                                    if (this->player->hasObject(obj)) {
-                                        allowed = true;
-                                    } else {
-                                        msg = "You must be carrying " + obj->getInventoryMessage();
-                                    }
-                                }
-                                // IF 200<M<=300	MUST BE CARRYING OR IN SAME ROOM AS M-200.
-                                else if (M > 200 && M <= 300) {
-                                    Object* obj = this->data->getObjectByNumber(M-200);
-                                    if (obj != NULL) {
-                                        if (this->player->hasObject(obj) || currentLocation->hasObject(obj)) {
-                                            allowed = true;
-                                        } else {
-                                            msg = "You must be carrying or be in the same room as " + obj->getInventoryMessage();
-                                        }
-                                    }
-                                }
-                                // IF 300<M<=400	PROP(M MOD 100) MUST *NOT* BE 0.
-                                else if (M > 300 && M <= 400) {
-                                    Object* obj = this->data->getObjectByNumber(M%100);
-                                    if (obj != NULL) {
-                                        if (obj->getPropertyValue() != 0) {
-                                            allowed = true;
-                                        } else {
-                                            if (loc->getNumber() == 9 && obj->getNumber() == 1003) {
-                                                msg = this->data->getMessageByNumber(63)->getContent();
-                                            } else {
-                                                msg = "Property value must not be 0.";
-                                            }
-                                        }
-                                    }
-                                }
-                                // IF 400<M<=500	PROP(M MOD 100) MUST *NOT* BE 1.
-                                else if (M > 400 && M <= 500) {
-                                    Object* obj = this->data->getObjectByNumber(M%100);
-                                    if (obj != NULL) {
-                                        if (obj->getPropertyValue() != 1) {
-                                            allowed = true;
-                                        } else {
-                                            msg = "Property value must not be 1.";
-                                        }
-                                    }
-                                }
-                                // IF 500<M<=600	PROP(M MOD 100) MUST *NOT* BE 2, ETC.
-                                else if (M > 500 && M <= 600) {
-                                    Object* obj = this->data->getObjectByNumber(M%100);
-                                    if (obj != NULL) {
-                                        if (obj->getPropertyValue() != 2) {
-                                            allowed = true;
-                                        } else {
-                                            msg = "Property value must not be 2.";
-                                        }
-                                    }
-                                }
-                                
-                                // If not allowed, get next condition
-                                if (!allowed) {
-                                    cond = currentLocation->getLocationConditionAfterLocationCondition(cond);
-                                }
-                            }
-                            
-                            // All requirements were not met
-                            if (!allowed) {
-                                return msg;
-                            }
-                            // All requirements met
-                            else {
-                                /*stringstream ss;
-                                ss << "Going to: " << loc->getNumber() << ", M: " << M << endl;
-                                msg = ss.str();*/
-                                // 16	IT IS NOW PITCH DARK.  IF YOU PROCEED YOU WILL LIKELY FALL INTO A PIT.
-                                // Go to new location
-                                this->player->setCurrentLocation(loc);
-                                return loc->getShortDescription() + (loc->getShortDescription() != "" ? "\n" : "") + loc->getLongDescription() + (!loc->isAsset(0) && (!this->player->hasObject(this->data->getObjectByNumber(2)) || (this->player->hasObject(this->data->getObjectByNumber(2)) && !this->data->getObjectByNumber(2)->isLit())) ? "\n\n" + this->data->getMessageByNumber(16)->getContent() : "") + this->getHint(loc);
-                            }
-                        }
-                    }
-                    break;
-                }
+                return this->handleMovementAndLook(spokenWords, (MotionVerb*)spokenWords.at(0));
             } else if (dynamic_cast<ActionVerb*>(spokenWords.at(0))) {
                 ActionVerb* verb = (ActionVerb*)spokenWords.at(0);
                 return verb->getDefaultMessage();
@@ -240,7 +244,7 @@ string Game::parseInput(string input) {
                 
                 // "goto building", "<ActionVerb> <MotionVerb>"
                 if (dynamic_cast<MotionVerb*>(spokenWords.at(1))) {
-                    
+                    return this->handleMovementAndLook(spokenWords, (MotionVerb*)spokenWords.at(1));
                 }
                 // "get keys", "off lamp", "<ActionVerb> <Object>"
                 else if (dynamic_cast<Object*>(spokenWords.at(1))) {

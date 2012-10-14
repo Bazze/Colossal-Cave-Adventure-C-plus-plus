@@ -28,6 +28,8 @@ private:
     
     string getHint(Location* loc) const;
     
+    string handleMovementAndLook(vector<Word*> &spokenWords, MotionVerb* verb);
+    
 public:
     Game();
     virtual ~Game();

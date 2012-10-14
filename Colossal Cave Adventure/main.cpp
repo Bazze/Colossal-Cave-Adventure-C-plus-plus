@@ -50,9 +50,6 @@ int main(int argc, const char * argv[])
 {
     signal(SIGHUP,sighupHandler);
     
-    // insert code here...
-    std::cout << "Hello, World!\n";
-    
     /* The Server Code */
     /* A big Thank You to Professor Michael J. Donahoo
      at the School of Engineering & Computer Science
@@ -151,7 +148,7 @@ bool exitMsg(char *buffer){
 
 // TCP client handling function
 void HandleTCPClient(TCPSocket *sock, Game* game) {
-    cout << "Handling client ";
+    /*cout << "Handling client ";
     try {
         cout << sock->getForeignAddress() << ":";
     } catch (SocketException &e) {
@@ -162,7 +159,7 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
     } catch (SocketException &e) {
         cerr << "ERROR: Unable to get foreign port" << endl;
     }
-    cout << " with thread " << pthread_self() << endl;
+    cout << " with thread " << pthread_self() << endl;*/
     
     // Send received string and receive again until the end of transmission
     
@@ -199,7 +196,7 @@ void HandleTCPClient(TCPSocket *sock, Game* game) {
         }
         
         if(str != "") {
-            cout << sock->getForeignAddress() << ":" << sock->getForeignPort() << " says: " << str << endl;
+            //cout << sock->getForeignAddress() << ":" << sock->getForeignPort() << " says: " << str << endl;
             returnMsg = game->parseInput(str);
             if (returnMsg != "") {
                 returnMsg += "\n";
