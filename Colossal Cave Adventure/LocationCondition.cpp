@@ -2,8 +2,8 @@
 //  LocationCondition.cpp
 //  Colossal Cave Adventure
 //
-//  Created by Sebastian Norling on 2012-10-08.
-//  Copyright (c) 2012 SN Solutions. All rights reserved.
+//  Created by Sebastian Norling and Niclas Björner on 2012-10-08.
+//  Copyright (c) 2012. All rights reserved.
 //
 
 #include "LocationCondition.h"
